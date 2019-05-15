@@ -4,6 +4,9 @@
   "description": "Portfolio sire using Express, Vue and Mongo",
   "main": "server/main.js",
   "scripts": {
+    "build_front": "npm run --prefix front build",
+    "watch_front": "npm run --prefix front watch",
+    "heroku": "npm run build_front && git add . && git commit -m 'deploy' && git push heroku master",
     "start": "node server/main.js",
     "dev": "nodemon server/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
