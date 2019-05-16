@@ -17,8 +17,15 @@ function getPhotos() {
 /* GET photos listing. */
 router.get('/', function (req, res, next) {
     let photos = getPhotos();
-
     res.send(photos);
+});
+
+router.post('/:id', (req, res) => {
+    require('../model/site').PhotoDAO.create({
+        path: req.params.id.toString(),
+        hash: 'lols'
+    })
+    res.send('done');
 });
 
 router.get('/:id', function (req, res, next) {
