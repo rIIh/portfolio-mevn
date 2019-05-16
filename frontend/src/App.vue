@@ -24,19 +24,33 @@ export default {
 
 
 <style lang="scss">
-$firstbreak: 800px;
+$firstbreak: 1024px;
 
-$footerHeight: 64px;
+$footerHeight: 125px;
+
+h1 {
+  font-family: "Space Mono";
+}
+a {
+  font-family: "Space Mono";
+}
+
 .view {
-  margin: 32px;
-  margin-bottom: 100px;
+  padding: 32px;
+  padding-bottom: 100px;
+  width: 100%;
+  height: 100%;
 }
 
 body,
-html {
+html,
+#app {
   padding: 0;
   margin: 0;
+  width: 100%;
+  height: 100%;
 }
+
 
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
@@ -68,31 +82,11 @@ header {
   height: $footerHeight;
   transition: 0.5s;
   opacity: 1;
-  background-color: white;
 }
 
 footer {
   position: fixed;
   bottom: 0;
   width: 100%;
-}
-
-#nav {
-  padding: 24px;
-
-  a {
-    font-weight: bold;
-    color: grey;
-    transition: 0.3s;
-
-    &:hover {
-      color: lightgrey;
-      transition: 0.3s;
-    }
-
-    &.router-link-exact-active {
-      color: black;
-    }
-  }
 }
 </style>

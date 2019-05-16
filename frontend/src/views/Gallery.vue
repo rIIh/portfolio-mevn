@@ -1,5 +1,5 @@
 <template lang="pug">
-  .home
+  #gal.home
     CAside
       nav(class="photo_nave" v-if="photos !== undefined")
         router-link(class="link" :to="'album_'+album.name" v-for="(album, index) in photos" :key="index" @mouseenter.native="openAndTop(index)" )
@@ -9,8 +9,9 @@
       div(v-for="(album, index) in photos" :key="index")
         router-link(:to="'album_'+album.name")
           img(:src="album.path")
-    .photo_container_stack
-      img(v-for="(album, index) in showQueue" :key="index" :src="album.path" :style="album.position")
+    .photo_container_stack(ref="galleryStack")
+      img(v-for="(album, index) in showQueue" :key="index" :src="album.path" ref="stackImg")
+
 </template>
 
 <script>
@@ -24,7 +25,9 @@ export default {
   data() {
     return {
       photos: [],
-      showQueue: []
+      scale: 2,
+      showQueue: [],
+      stack: {}
     };
   },
   computed: {
@@ -33,12 +36,41 @@ export default {
       return path === undefined ? "" : path;
     }
   },
+  updated() {
+    this.position();
+  },
   methods: {
     async getPhotos() {
       const response = await axios.get("api/photos");
       this.photos = response.data;
       this.photos.forEach(p => {
         p.path = this.assetsPath + p.path;
+      });
+    },
+    handleResize() {
+      var refs = this.$refs.galleryStack;
+      this.stack = {
+        width: refs.clientWidth,
+        height: refs.clientHeight
+      };
+    },
+    position() {
+      var images = this.$refs.stackImg;
+      if (images === undefined) return;
+
+      images.forEach((t, index) => {
+        //left
+        var left =
+          this.showQueue[index].position.left *
+          (this.stack.width - t.clientWidth);
+        //top
+        var top =
+          this.showQueue[index].position.top *
+          (this.stack.height - t.clientHeight);
+
+        t.style.left = Math.round(left).toString() + "px";
+        t.style.top = Math.round(top).toString() + "px";
+        console.log(t.style.left);
       });
     },
     openAndTop(id) {
@@ -56,9 +88,11 @@ export default {
       }
 
       // TODO figure out how to get screen and img dimensions
-      var randLeft = Math.random() * 40;
+      var randLeft = Math.random();
+      var randTop = Math.random();
       target.position = {
-        left: randLeft + "%"
+        left: randLeft,
+        top: randTop
       };
 
       result.push(target);
@@ -67,6 +101,11 @@ export default {
   },
   mounted() {
     this.getPhotos();
+    window.addEventListener("resize", this.handleResize);
+    this.handleResize();
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.handleResize);
   },
   components: {
     CAside
@@ -75,10 +114,18 @@ export default {
 </script>
 
 <style lang="scss">
-$asideWidth: 15vw;
-$secondbreak: 400px;
-$firstbreak: 800px;
+$asideWidth: 100px;
+$secondbreak: 512px;
+$firstbreak: 1024px;
 $photo_stack_height: 80vh;
+
+
+section.has-text-centered {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+}
 
 @media screen and (max-width: $firstbreak) {
   .photo_container_stack {
@@ -114,22 +161,21 @@ $photo_stack_height: 80vh;
   }
   .photo_container_stack {
     height: 100%;
-    max-height: 80%;
+    max-height: 95%;
     padding: 16px 32px;
     margin: 0px 32px;
     overflow: hidden;
     position: relative;
     img {
       position: absolute;
-      min-height: 100%;
-      max-height: 100%;
+      max-width: 95%;
+      max-height: 95%;
     }
   }
 
   aside {
     height: 100vh;
     width: $asideWidth;
-    min-width: 10vw;
     position: fixed;
     z-index: 1;
     top: 0;
@@ -141,16 +187,17 @@ $photo_stack_height: 80vh;
     a {
       padding-right: 10px;
       padding-bottom: 10px;
-      padding-left: 5px;
+      padding-left: 10px;
       text-decoration: none;
       font-size: 16px;
       color: grey;
       display: block;
       transition: 0.3s;
-      text-align: end;
+      text-align: start;
 
       &:hover {
-        color: whitesmoke;
+        color: lightgrey;
+        padding-left: 20px;
       }
       cursor: pointer;
     }

@@ -1,9 +1,10 @@
-var express = require('express');
+import * as express from 'express';
 var router = express.Router();
+var DAO = require('./../model/site');
 
 function getPhotos() {
     var photos = []
-    words = ['art', 'car', 'bus', 'earth', 'camera', 'phone', 'sun', 'light', 'number', 'beuty']
+    var words = ['art', 'car', 'bus', 'earth', 'camera', 'phone', 'sun', 'light', 'number', 'beuty']
     for (var i = 1; i < 14; i++) {
         photos.push({
             name: words[i % 10],
@@ -12,6 +13,10 @@ function getPhotos() {
     }
     return photos
 };
+
+router.get('/albums/', function(req, res, next) {
+    DAO.AlbumDAO.find({}, )
+});
 
 
 /* GET photos listing. */
