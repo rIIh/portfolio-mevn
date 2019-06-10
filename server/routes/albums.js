@@ -1,7 +1,6 @@
 var router = require('express').Router();
 var DAO = require('../model/models');
-const formidable = require('formidable')
-
+const formidable = require('formidable');
 
 function getPhotos() {
     var photos = []
@@ -36,23 +35,7 @@ router.get('/', function (req, res, next) {
     getAlbums(req.body.authenticated, res);
 });
 
-router.put('/', function (req, res, next) {
-    let queue = []
-    req.body.forEach(album => {
-        queue.push({
-            updateOne: {
-                filter: {
-                    _id: album._id
-                },
-                update: album
-            }
-        })
-    });
-    DAO.AlbumDAO.bulkWrite(queue)
-    res.json(queue)
-})
-
-router.post('/', (req, res) => {
+function parseAlbum(req, next) {
     let form = new formidable.IncomingForm();
     let album = {
         name: '',
@@ -76,45 +59,69 @@ router.post('/', (req, res) => {
             })
         })
         .on('field', (name, field) => {
+            // if (name === 'photos') {
+            //     Array.from(field).forEach(photo => {
+            //         album[name].push(photo)
+            //     });
+            // } else
             album[name] = field
         })
         .on('end', () => {
             console.log(album);
             album.hidden = false;
-            DAO.AlbumDAO.findOne({
-                name: album.name
-            }, (err, result) => {
-                if (err) throw (err)
-                if (result !== null) {
-                    console.log(result)
-                    res.status(400).send('already exists')
-                } else {
-                    DAO.AlbumDAO.create(album);
-                    res.send('done')
-                }
-            })
-            // album.photos.forEach(photo => {
-            //     DAO.PhotoDAO.findOne({
-            //         hash: photo.hash
-            //     }, (err, res) => {
-            //         if(err) throw err;
-            //         if(res !== undefined){
-            //             PhotoDAO.
-            //         }
-            //     })
-            // });
-
+            next(album);
         })
+}
 
+router.put('/', function (req, res, next) {
+    let queue = []
+    req.body.forEach(album => {
+        queue.push({
+            updateOne: {
+                filter: {
+                    _id: album._id
+                },
+                update: album
+            }
+        })
+    });
+    DAO.AlbumDAO.bulkWrite(queue)
+    res.json(queue)
 })
 
-router.post('/:id', (req, res) => {
-    require('../model/models').PhotoDAO.create({
-        path: req.params.id.toString(),
-        hash: 'lols'
+router.put('/:name', function (req, res, next) {
+    let name = req.params.name
+    parseAlbum(req, album => {
+        console.log(album, name);
+        DAO.AlbumDAO.updateOne({
+            name: name
+        }, album, {}, (err, result) => console.log(err, result));
+        res.send('done')
+    });
+})
+
+router.delete('/:name', function (req, res, next) {
+    DAO.AlbumDAO.deleteOne({
+        name: req.params.name
+    }, console.log)
+    res.send('done')
+})
+
+router.post('/', (req, res) => {
+    parseAlbum(req, album => {
+        DAO.AlbumDAO.findOne({
+            name: album.name
+        }, (err, result) => {
+            if (err) throw (err)
+            if (result !== null) {
+                res.status(400).send('already exists')
+            } else {
+                DAO.AlbumDAO.create(album);
+                res.send('done')
+            }
+        })
     })
-    res.send('done');
-});
+})
 
 router.get('/:id', function (req, res, next) {
     DAO.AlbumDAO.findOne({

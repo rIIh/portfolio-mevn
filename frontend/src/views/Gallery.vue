@@ -1,7 +1,9 @@
 <template lang="pug">
   .home
-    v-dialog(v-model="edit" lazy max-width="450px")
-      album(:was="albums[album_edit_index]" @uploaded="edit = !edit; showMessage()") Edit album
+    v-dialog(v-model="edit" max-width="450px")
+      album(:was="model" ref="editor" @uploaded="showMessage" @done="edit = !edit") Edit album
+    v-snackbar(color="primary" v-model="success") Album successully uploaded
+      v-btn(dark flat @click.native="success = false") Close
     v-layout(fill-height v-if="breakpoint.mdAndUp")
       v-flex(shrink)
         v-layout.nav_side(column)
@@ -10,7 +12,7 @@
               a(:style="{'text-decoration': album.hidden ? 'line-through' : 'none', 'overflow-x': adminMode ? 'hidden' : ''}") {{ album.name }}
             transition(name="fade")
               span(v-if="adminMode" v-show="album.mouseOverLink")
-                button(@click="album_edit_index = index; edit = true")
+                button(@click="openEditor(index)")
                   v-icon edit
                 button(@click="swapVisible(index)")
                   v-icon {{ !albums[index].hidden ? 'visibility' : 'visibility_off' }}
@@ -47,14 +49,17 @@ import Album from "@/components/Album.vue";
 import { SweetModal, SweetModalTab } from "sweet-modal-vue";
 const api = require("../api/gallery_api");
 
+import { EventBus } from "@/event-bus.js";
+
 export default {
   name: "home",
   data() {
     return {
       albums: [],
-      album_edit_index: 0,
+      model: {},
       stack: {},
-      edit: false
+      edit: false,
+      success: false
     };
   },
   computed: {
@@ -80,6 +85,14 @@ export default {
     next();
   },
   methods: {
+    showMessage() {
+      this.success = true;
+      setTimeout(() => (this.success = false), 2000);
+    },
+    openEditor(index) {
+      this.edit = true;
+      this.model = JSON.parse(JSON.stringify(this.albums[index]));
+    },
     leaving() {
       api.updateAlbums(this.albums, this.$axios);
     },
@@ -155,11 +168,15 @@ export default {
     this.getAlbums();
     window.addEventListener("resize", this.handleResize);
     window.addEventListener("beforeunload", this.leaving);
+    EventBus.$on("album-db-changed", this.getAlbums);
+  },
+  updated() {
     this.handleResize();
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.handleResize);
     window.removeEventListener("beforeunload", this.leaving);
+    EventBus.$off("album-db-changed", this.getAlbums);
     this.leaving();
   },
   components: {

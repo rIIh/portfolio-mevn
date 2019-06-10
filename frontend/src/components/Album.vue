@@ -17,7 +17,7 @@
                                             v-icon(dark) done
                                     button.remove_btn(@click.stop="removePhoto(index)")
                                         v-icon(dark) clear
-                                    img(:src="editing ? assetsPath + photo.path : photo.path" :key="index" width="100%")
+                                    img(:src="(editing && !photo.file) ? assetsPath + photo.path : photo.path" :key="index" width="100%")
                         v-alert(type="error" outline :value="model.photos[0] === undefined") At least one photo is required
                         
                         v-btn(round @click="pickPhotos") Select photos
@@ -34,6 +34,7 @@
 <script>
 const C = require("../api/consts");
 const Api = require("../api/gallery_api");
+import { EventBus } from "@/event-bus.js";
 
 export default {
   data() {
@@ -47,9 +48,9 @@ export default {
       }
     };
   },
-  mounted() {
-    if (this.was !== undefined) {
-      this.model = this.was;
+  watch: {
+    was: function(newVal, oldVal) {
+      this.model = JSON.parse(JSON.stringify(newVal));
     }
   },
   computed: {
@@ -97,19 +98,56 @@ export default {
       this.$refs.form.validate();
 
       if (this.valid) {
-        var response = await Api.uploadAlbum(this.model, this.$axios).catch(
-          err => {
-            if (err.status === 400) {
-            }
+        var response = await Api.uploadAlbum(this.model).catch(err => {
+          if (err.status === 400) {
+            console.log(err);
           }
-        );
-        if (response.status === 200) this.$emit("uploaded");
+        });
+        if (response.status === 200) {
+          this.$emit("uploaded");
+          this.$emit("done");
+          EventBus.$emit("album-db-changed");
+          this.model = {
+            name: "",
+            coverIndex: 0,
+            photos: []
+          };
+        }
       }
     },
     async update() {
       console.log("Update");
       this.$refs.form.validate();
 
+      if (this.valid) {
+        var response = await Api.updateAlbum(this.model, this.was).catch(
+          err => {
+            if (err.status === 400) {
+              console.log(err);
+            }
+          }
+        );
+        if (response.status === 200) {
+          this.$emit("uploaded");
+          this.$emit("done");
+          EventBus.$emit("album-db-changed");
+          this.model = {
+            name: "",
+            coverIndex: 0,
+            photos: []
+          };
+        }
+      }
+    },
+    async remove() {
+      var response = await Api.removeAlbum(this.was).catch(err =>
+        console.log(err)
+      );
+      if (response.status === 200) {
+        this.$emit("done");
+        EventBus.$emit("album-db-changed");
+      }
+      //   this.$refs.form.validate();
       //   if (this.valid) {
       //     var response = await Api.uploadAlbum(this.model, this.$axios).catch(
       //       err => {
@@ -119,19 +157,6 @@ export default {
       //     );
       //     if (response.status === 200) this.$emit("uploaded");
       //   }
-    },
-    async remove() {
-      this.$refs.form.validate();
-
-      if (this.valid) {
-        var response = await Api.uploadAlbum(this.model, this.$axios).catch(
-          err => {
-            if (err.status === 400) {
-            }
-          }
-        );
-        if (response.status === 200) this.$emit("uploaded");
-      }
     }
   }
 };

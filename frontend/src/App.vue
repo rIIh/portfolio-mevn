@@ -6,7 +6,7 @@
       v-btn(dark flat @click.native="success = false") Close
 
     v-container(style="max-width: 100%")
-      v-layout(column fill-height style="min-height: 100%")
+      v-layout(column fill-height)
         v-flex(shrink)
           v-layout(justify-space-between row align-content-center)
             v-flex(shrink align-self-center)
@@ -81,6 +81,10 @@ export default {
 <style lang="scss">
 $firstbreak: 1024px;
 $footerHeight: 125px;
+
+.application--wrap {
+  min-height: 100% !important;
+}
 
 .tooltip {
   background-color: lightgoldenrodyellow;
