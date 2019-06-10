@@ -1,16 +1,17 @@
 <template lang="pug">
-  #album
-    h1 {{photo.name}}
-    img(class="photo" :src="photo.path" alt="photo from album")
+  #album(v-if="album !== undefined")
+    h1(v-tooltip="'Название альбома'") {{album.name}}
+    img(v-tooltip="'Обложка альбома'" class="photo" :src="assetsPath + album.photos[album.coverIndex].path" alt="photo from album")
+    h2 Тут будут фото
+    h3 Как это будет выглядеть?
 </template>
 
 <script>
-import Axios from "axios";
 export default {
   data() {
     return {
       id: -1,
-      photo: {}
+      album: undefined
     };
   },
   computed: {
@@ -20,15 +21,14 @@ export default {
     }
   },
   methods: {
-    async loadPhoto() {
-      let res = await Axios.get("api/photos/" + this.id);
-      this.photo = res.data;
-      this.photo.path = this.assetsPath + this.photo.path;
+    async loadAlbum() {
+      let res = await this.$axios.get("api/albums/" + this.id);
+      this.album = res.data;
     }
   },
   mounted() {
     this.id = this.$route.params.id;
-    this.loadPhoto();
+    this.loadAlbum();
   }
 };
 </script>

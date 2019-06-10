@@ -4,16 +4,13 @@
   "description": "Portfolio sire using Express, Vue and Mongo",
   "main": "server/main.js",
   "scripts": {
-    "build_front": "npm run --prefix front build",
-    "watch_front": "npm run --prefix front watch",
+    "build_front": "npm run --prefix frontend build",
+    "watch_front": "npm run --prefix frontend watch",
     "heroku": "npm run build_front && git add . && git commit -m 'deploy' && git push heroku master",
     "start": "node server/main.js",
     "dev": "nodemon server/main.js",
-    "dev_watch": "nodemon server/main.js & npm run watch_front",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start:ts": "node --inspect=5858 -r ts-node/register ./server/main.ts",
-    "start:watch": "nodemon",
-    "build": "tsc"
+    "dev:watch": "nodemon server/main.js & npm run watch_front",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "site",
@@ -22,36 +19,21 @@
   "author": "Alexey Skrynnic",
   "license": "MIT",
   "devDependencies": {
-    "@types/express": "^4.16.1",
-    "@types/mongoose": "^5.5.1",
-    "@types/node": "^12.0.2",
     "morgan": "^1.9.1",
-    "nodemon": "^1.19.0",
-    "ts-node": "^8.1.0",
-    "typescript": "^3.4.5"
+    "nodemon": "^1.19.0"
   },
   "dependencies": {
+    "bcrypt": "^3.0.6",
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "express-session": "^1.16.1",
+    "formidable": "^1.2.1",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.5.8",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "socket.io": "^2.2.0"
-  },
-  "nodemonConfig": {
-    "ignore": [
-      "**/*.test.ts",
-      "**/*.spec.ts",
-      ".git",
-      "node_modules"
-    ],
-    "watch": [
-      "server"
-    ],
-    "exec": "npm run start:ts",
-    "ext": "ts"
   }
 }

@@ -5,13 +5,32 @@ import Login from "./views/Login";
 import Album from "./views/AlbumPage";
 import Home from "./views/Home";
 
+import store from "./store"
+const C = require('./api/consts')
+
 Vue.use(Router);
 
-export default new Router({
+// ? Maybe not
+const ifNotAuthenticated = (to, from, next) => {
+  if (!store.getters.isAuthenticated) {
+    next()
+    return
+  }
+  next('/')
+}
+
+const ifAuthenticated = (to, from, next) => {
+  if (store.getters.isAuthenticated) {
+    next()
+    return
+  }
+  next('/login')
+}
+
+const router = new Router({
   mode: "history",
   base: process.env.BASE_URL,
-  routes: [
-    {
+  routes: [{
       path: '/',
       name: 'home',
       component: Home
@@ -39,7 +58,19 @@ export default new Router({
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () =>
-        import(/* webpackChunkName: "about" */ "./views/About.vue")
+        import( /* webpackChunkName: "about" */ "./views/About.vue")
     }
   ]
 });
+
+router.beforeEach((to, from, next) => {
+  if (store.getters.isAuthenticated) {
+    store.dispatch(C.AUTH_CHECK).then(res => {
+      next()
+    }).catch(err => {
+      next('/')
+    })
+  } else next();
+})
+
+export default router;
