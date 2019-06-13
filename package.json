@@ -4,12 +4,13 @@
   "description": "Portfolio sire using Express, Vue and Mongo",
   "main": "server/main.js",
   "scripts": {
-    "build_front": "npm run --prefix frontend build",
-    "watch_front": "npm run --prefix frontend watch",
-    "heroku": "npm run build_front && git add . && git commit -m 'deploy' && git push heroku master",
-    "start": "node server/main.js",
-    "dev": "nodemon server/main.js",
-    "dev:watch": "nodemon server/main.js & npm run watch_front",
+    "front:build": "npm run --prefix frontend build",
+    "front:watch": "npm run --prefix frontend build --watch",
+    "heroku:front": "npm run front:build && git add . && git commit -m 'deploy' && git push heroku master",
+    "heroku": "git add -A && git commit -m 'deploy' && git push heroku master",
+    "start": "NODE_ENV=production node server/main.js",
+    "dev": "NODE_ENV=development nodemon --ignore './frontend/' server/main.js",
+    "dev:watch": "npm run dev & npm run front:watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -27,6 +28,8 @@
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
+    "dotenv": "^8.0.0",
+    "dotenv-flow": "^2.0.0",
     "express": "^4.16.4",
     "express-session": "^1.16.1",
     "formidable": "^1.2.1",
@@ -34,6 +37,7 @@
     "mongoose": "^5.5.8",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.2.0",
+    "vue2-scrollbar": "0.0.3"
   }
 }

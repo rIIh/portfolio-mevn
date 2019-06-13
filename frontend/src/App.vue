@@ -1,38 +1,66 @@
 <template lang="pug">
-  v-app#app
-    v-dialog(v-model="post" lazy max-width="450px")
-      album(@uploaded="post = !post; showMessage()") Upload new album
+  v-app#app(:class="heightBlocked ? 'block-height' : ''" )
+    v-navigation-drawer(absolute v-model="tools" v-if="breakpoint.smAndDown && isAuth")
+      v-list
+        v-list-tile(@click="adminChange")
+          v-list-tile-action
+            v-checkbox(v-model="adminMode" readonly)
+          v-list-tile-content 
+            v-list-tile-title admin mode
+        v-list-tile(@click="post = !post; tools = false")
+          v-list-tile-action
+            v-icon.material-icons-outlined attachment
+          v-list-tile-content 
+            v-list-tile-title post album
+        v-list-tile(@click="logout")
+          v-list-tile-action
+            v-icon.material-icons-outlined exit_to_app
+          v-list-tile-content 
+            v-list-tile-title log out
+
+    v-layout(justify-space-between align-baseline shrink style="padding: 24px; padding-bottom: 0")
+      v-flex(shrink)
+        v-icon.pr-3(@click.stop="tools = !tools" v-if="breakpoint.smAndDown && isAuth") menu
+        router-link(:to="link()" class="main link")
+          h1.brand(:class="$store.getters.theme" :style="breakpoint.smAndDown ? 'font-size: 24px' : ''") Yura&nbsp;Taralov
+        template(v-if="isAuth && breakpoint.mdAndUp")
+          span.no-wrap.px-3
+            //- button.darkify.custom-btn.px-3(:class="adminMode ? 'pressed' : 'depressed'" @click="adminChange") admin mode
+            r-btn.px-3(:pressed="adminMode" @click="adminChange") admin mode
+            r-btn.px-3(@click="post = !post") post album
+            r-btn.px-3(@click="logout") log out
+            r-btn.pa-0()
+              v-icon.material-icons-outlined(small) settings
+      v-flex(shrink)
+        router-link.link.about(to="/about") Contacts
+    v-content
+      v-container(fluid fill-height)
+        v-flex(fill-height)
+          router-view.view(@block-height="heightBlocked = true" @unblock-height="heightBlocked = false")
+
+
+    v-dialog(v-model="post" :persistent="uploading" lazy max-width="450px")
+      album(@uploaded="post = !post; showMessage()" @busy="uploading = true" @unbusy="uploading = false") Upload new album
     v-snackbar(color="primary" v-model="success") Album successully uploaded
       v-btn(dark flat @click.native="success = false") Close
-
-    v-container(style="max-width: 100%")
-      v-layout(column fill-height)
-        v-flex(shrink)
-          v-layout(justify-space-between row align-content-center)
-            v-flex(shrink align-self-center)
-              router-link.pr-3(:to="link()" class="main link" v-tooltip="'Этих надписей и подсказок в финале не будет'")
-                h1 Yura Taralov
-              template(v-if="isAuth")
-                v-btn.px-3(round small @click="adminChange" :depressed="adminMode" :color="adminMode ? 'blue' : ''" :dark="adminMode") admin mode
-                v-btn.px-3(round small @click="post = !post") post album
-                v-btn(round small @click="logout") log out
-            v-flex(shrink align-self-center)
-              router-link(to="/about") Contacts
-        v-flex()
-          router-view.view
 </template>
 
 <script>
 import Navigation from "@/components/Navigation.vue";
 import Album from "@/components/Album.vue";
 import Axios from "axios";
+import { Bus } from "./event-bus";
+
 const C = require("./api/consts");
 
 export default {
   data() {
     return {
       post: false,
-      success: false
+      success: false,
+      uploading: false,
+      heightBlocked: false,
+      tools: false
     };
   },
   computed: {
@@ -41,6 +69,9 @@ export default {
     },
     isAuth() {
       return this.$store.getters.isAuthenticated;
+    },
+    breakpoint() {
+      return this.$vuetify.breakpoint;
     }
   },
   methods: {
@@ -55,8 +86,22 @@ export default {
     adminChange() {
       this.$store.dispatch(C.ADMIN_MODE_SWAP);
     },
-    logout() {
-      this.$store.dispatch(C.AUTH_LOGOUT);
+    async logout() {
+      await this.$store.dispatch(C.AUTH_LOGOUT);
+      console.log("logut");
+      Bus.$emit("log-out");
+    },
+    resize(data) {
+      let s = data.target.screen;
+      Bus.$emit("window-resize");
+      this.$store.dispatch(C.RESIZE, {
+        availHeight: s.availHeight,
+        height: s.height,
+        orientation: {
+          angle: s.orientation.angle,
+          type: s.orientation.type
+        }
+      });
     }
   },
   created: function() {
@@ -70,87 +115,16 @@ export default {
       });
     });
   },
+  mounted() {
+    window.addEventListener("resize", this.resize);
+    this.resize({ target: window });
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.resize);
+  },
   components: {
     Navigation,
     Album
   }
 };
 </script>
-
-
-<style lang="scss">
-$firstbreak: 1024px;
-$footerHeight: 125px;
-
-.application--wrap {
-  min-height: 100% !important;
-}
-
-.tooltip {
-  background-color: lightgoldenrodyellow;
-  border-radius: 10px;
-  z-index: 10000000;
-  .tooltip-inner {
-    padding: 10px;
-    max-width: 300px;
-  }
-}
-
-.v-btn {
-  vertical-align: super !important;
-}
-
-a.main {
-  text-decoration: none;
-  h1 {
-    color: black;
-    display: inline;
-    text-align: center;
-  }
-}
-
-a {
-  font-weight: bold;
-  color: black;
-  transition: 0.3s;
-
-  &:hover {
-    color: lightgray;
-    transition: 0.3s;
-  }
-
-  &.router-link-exact-active {
-    color: white;
-  }
-}
-
-.force-overflow {
-  min-height: 450px;
-}
-
-.view {
-  padding-top: 32px;
-  width: 100%;
-}
-
-body,
-html,
-#app {
-  min-width: 100%;
-  width: 100%;
-  min-height: 100%;
-  height: 100%;
-}
-
-#app {
-  display: flex;
-  flex-grow: 1;
-  flex-flow: column;
-  font-family: "Space Mono", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  overflow: hidden;
-}
-</style>

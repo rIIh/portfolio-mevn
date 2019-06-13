@@ -2,24 +2,6 @@ var router = require('express').Router();
 var DAO = require('../model/models');
 const formidable = require('formidable');
 
-function getPhotos() {
-    var photos = []
-    var words = ['art', 'car', 'bus', 'earth', 'camera', 'phone', 'sun', 'light', 'number', 'beuty', 'tee', 'setf', 'esdff', 'asdds']
-    for (var i = 1; i < 14; i++) {
-        photos.push({
-            name: words[i % 14],
-            cover: {
-                path: 'photos/' + i + '.jpg'
-            },
-            photos: []
-        })
-    }
-    return photos
-};
-
-// router.get('/', function (req, res, next) {
-//     DAO.AlbumDAO.find({}, )
-// });
 
 function getAlbums(authenticated, response) {
     DAO.AlbumDAO.find(authenticated ? {} : {
@@ -73,7 +55,39 @@ function parseAlbum(req, next) {
         })
 }
 
+function parsePhotos(req, next) {
+    let form = new formidable.IncomingForm();
+    let photos = [];
+
+    var path = require('path');
+    var appDir = path.dirname(require.main.filename);
+    form.uploadDir = appDir + '/resources/photos'
+    form.keepExtensions = true;
+    form.hash = 'md5';
+
+    try {
+        form.parse(req)
+            .on('file', (name, file) => {
+                console.log(file)
+                photos.push({
+                    path: file.path.substring(file.path.indexOf('photos')),
+                    hash: file.hash,
+                })
+            })
+            .on('field', (name, field) => {
+                console.log(name, field)
+            })
+            .on('error', (err) => console.log(err))
+            .on('end', () => {
+                next(photos);
+            })
+    } catch (e) {
+        console.log(e)
+    }
+}
+
 router.put('/', function (req, res, next) {
+    if (!req.body.authenticated) res.status(401).send();
     let queue = []
     req.body.forEach(album => {
         queue.push({
@@ -85,22 +99,12 @@ router.put('/', function (req, res, next) {
             }
         })
     });
-    DAO.AlbumDAO.bulkWrite(queue)
+    DAO.AlbumDAO.bulkWrite(queue).then(res => console.log(res.insertedCount, res.modifiedCount, res.deletedCount))
     res.json(queue)
 })
 
-router.put('/:name', function (req, res, next) {
-    let name = req.params.name
-    parseAlbum(req, album => {
-        console.log(album, name);
-        DAO.AlbumDAO.updateOne({
-            name: name
-        }, album, {}, (err, result) => console.log(err, result));
-        res.send('done')
-    });
-})
-
 router.delete('/:name', function (req, res, next) {
+    if (!req.body.authenticated) res.status(401).send();
     DAO.AlbumDAO.deleteOne({
         name: req.params.name
     }, console.log)
@@ -108,6 +112,7 @@ router.delete('/:name', function (req, res, next) {
 })
 
 router.post('/', (req, res) => {
+    if (!req.body.authenticated) res.status(401).send();
     parseAlbum(req, album => {
         DAO.AlbumDAO.findOne({
             name: album.name
@@ -119,6 +124,32 @@ router.post('/', (req, res) => {
                 DAO.AlbumDAO.create(album);
                 res.send('done')
             }
+        })
+    })
+})
+
+router.post('/:id/photos_post', (req, res) => {
+    if (!req.body.authenticated) res.status(401).send();
+    if (req.params.id === undefined) res.status(404).send('nothing')
+    parsePhotos(req, photos => {
+
+        DAO.AlbumDAO.findOne({
+            _id: req.params.id
+        }, (err, result) => {
+            if (err) throw err;
+            if (result) {
+                Array.prototype.push.apply(result.photos, photos);
+                console.log(result.photos, photos)
+                DAO.AlbumDAO.updateOne({
+                    _id: req.params.id
+                }, {
+                    photos: result.photos
+                }, (err, result) => {
+                    console.log(err, result)
+
+                    res.send('done')
+                });
+            } else res.status(500).send('failed')
         })
     })
 })

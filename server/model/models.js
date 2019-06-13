@@ -44,16 +44,14 @@ const AlbumDAO = mongoose.model('album', new Schema({
     hidden: Boolean
 }))
 
-const TemplateDAO = mongoose.model('template', new Schema({
-    name: {
-        type: String,
-    },
-    value: String,
+const SettingsDAO = mongoose.model('settings', new Schema({
+    name: String,
+    value: Object
 }))
 
 module.exports = {
     UserDAO,
     PhotoDAO,
+    SettingsDAO,
     AlbumDAO,
-    TemplateDAO
 }

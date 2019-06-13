@@ -1,55 +1,48 @@
 <template lang="pug">
-  .home
-    v-dialog(v-model="edit" max-width="450px")
-      album(:was="model" ref="editor" @uploaded="showMessage" @done="edit = !edit") Edit album
+  .home(id="scroll-target" v-scroll="onScroll")
+    v-dialog(v-model="edit" :persistent="uploading" max-width="450px")
+      album(:was="model" ref="editor" @uploaded="showMessage" @done="edit = !edit" @busy="uploading = true" @unbusy="uploading = false") Edit album
     v-snackbar(color="primary" v-model="success") Album successully uploaded
       v-btn(dark flat @click.native="success = false") Close
-    v-layout(fill-height v-if="breakpoint.mdAndUp")
+    v-layout(fill-height v-if="breakpoint.mdAndUp" row)
       v-flex(shrink)
-        v-layout.nav_side(column)
-          div(class="link_row" v-for="(album, index) in albums" :key="album.name" @mouseenter="mouseEnterLink(index)" @mouseleave="mouseExitLink(index)" v-show="adminMode || !album.hidden")
-            router-link(class="link" :to="'album_'+album.name" @mouseenter.native="openAndTop(index)")
+        v-layout.nav_side(column fill-height)
+          div(class="link_row" shrink v-for="(album, index) in albums" :key="album.name" @mouseenter="mouseEnterLink(index); openAndTop(index)" @mouseleave="mouseExitLink(index)" v-show="adminMode || !album.hidden")
+            router-link(class="link" :to="'album_'+album.name")
               a(:style="{'text-decoration': album.hidden ? 'line-through' : 'none', 'overflow-x': adminMode ? 'hidden' : ''}") {{ album.name }}
             transition(name="fade")
               span(v-if="adminMode" v-show="album.mouseOverLink")
                 button(@click="openEditor(index)")
-                  v-icon edit
-                button(@click="swapVisible(index)")
-                  v-icon {{ !albums[index].hidden ? 'visibility' : 'visibility_off' }}
-      v-flex.px-5.py-0
-        .photo_container_stack(ref="photo_stack_container")
-          img(v-for="(album, index) in albums" v-show="album.topped"  :key="index" :src="assetsPath + album.photos[album.coverIndex].path" ref="photo_stack")
+                  v-icon.material-icons-outlined edit
+                button(@click="swapVisible(index); updateVisibility(index)")
+                  v-icon.material-icons-outlined {{ !albums[index].hidden ? 'visibility' : 'visibility_off' }}
+      v-flex.pl-2(grow style="overflow: hidden")
+        .photo_container_stack(ref="photo_stack_container" :style="{ transform: 'translate(0, '  + offset + 'px) scale(0.8) '}")
+          img(v-for="(album, index) in albums" v-show="album.topped && (!album.hidden || adminMode)"  :key="index" :src="assetsPath + album.photos[album.coverIndex].path" ref="photo_stack")
 
-
-    //- aside(class="nav_side")
-    //-   nav(class="photo_nav" v-if="albums !== undefined")
-    //-     //- router-link(class="link" :to="'album_'+album.name" v-for="(album, index) in albums" :key="album.name" @mouseenter.native="openAndTop(index)" )
-    //-     //-   a {{ album.name }}
-    //-     div(class="link_row" v-for="(album, index) in albums" :key="album.name")
-    //-       router-link(class="link" :to="'album_'+index" @mouseenter.native="openAndTop(index)" )
-    //-         a {{ album.name }}
-    //-       transition(name="fade")
-    //-         span(v-if="adminMode")
-    //-           eva-icon(name="edit-outline" class="click" animation="flip")
-    //-           eva-icon(:name="albums[index].visible ? 'eye-outline' : 'eye-off-outline'"  @click="swapVisible(index)" class="click" animation="flip" v-tooltip="'Если установлено скрыто, то в списке не появится у обычного пользователя, реализую позже'")
     .photo_container(v-else)
-      div(v-for="(album, index) in albums" :key="albums.name")
-        router-link(:to="'album_'+album.name")
-          img(:src="assetsPath + album.photos[album.coverIndex].path")
+      v-card(flat tile v-for="(album, index) in albums" :key="albums.name" v-show="!album.hidden || adminMode"  @click.stop="hoveredIndex=index")
+        template(v-if="adminMode")
+          //- transition(name="fade" v-if="adminMode")
+          span(v-show="hoveredIndex === index")
+            .overlay.disable-select.cover(style="height: 50%; width: 50%" @click="openEditor(index)")
+              v-icon.overlay_item.material-icons-outlined() edit
+            .overlay.disable-select.cover(style="height: 50%; width: 50%; transform: translate(100%, 0)" @click="swapVisible(index); updateVisibility(index)")
+              v-icon.overlay_item.material-icons-outlined {{ !albums[index].hidden ? 'visibility' : 'visibility_off' }}
+            router-link.overlay.disable-select.cover(:to="'album_'+album.name" style="height: 50%; transform: translate(0, 100%)")
+              v-icon.overlay_item.material-icons-outlined() arrow_forward
+          img(:src="assetsPath + album.photos[album.coverIndex].path" )
+        router-link(:to="'album_'+album.name" v-else)
+            img(:src="assetsPath + album.photos[album.coverIndex].path" )
 </template>
 
 <script>
 // @ is an alias to /src
-import CAside from "@/components/CustomAside";
-import PostForm from "@/components/PostForm";
-import Multifile from "@updivision/vue2-multi-uploader";
-import ScrollBar from "vue2-scrollbar";
 import Album from "@/components/Album.vue";
 
-import { SweetModal, SweetModalTab } from "sweet-modal-vue";
 const api = require("../api/gallery_api");
 
-import { EventBus } from "@/event-bus.js";
+import { Bus } from "@/event-bus.js";
 
 export default {
   name: "home",
@@ -58,8 +51,11 @@ export default {
       albums: [],
       model: {},
       stack: {},
+      hoveredIndex: -1,
+      offset: 0,
       edit: false,
-      success: false
+      success: false,
+      uploading: false
     };
   },
   computed: {
@@ -80,11 +76,10 @@ export default {
   updated() {
     this.position();
   },
-  beforeRouteLeave(to, from, next) {
-    this.leaving();
-    next();
-  },
   methods: {
+    onScroll(e) {
+      this.offset = e.target.scrollingElement.scrollTop;
+    },
     showMessage() {
       this.success = true;
       setTimeout(() => (this.success = false), 2000);
@@ -93,8 +88,11 @@ export default {
       this.edit = true;
       this.model = JSON.parse(JSON.stringify(this.albums[index]));
     },
-    leaving() {
-      api.updateAlbums(this.albums, this.$axios);
+    updateVisibility(index) {
+      api.updateAlbum({
+        _id: this.albums[index]._id,
+        hidden: this.albums[index].hidden
+      });
     },
     swapVisible(index) {
       this.albums[index].hidden = !this.albums[index].hidden;
@@ -107,7 +105,7 @@ export default {
         a.mouseOverLink = false;
         a.position = {
           left: Math.random(),
-          top: Math.random()
+          top: 0
         };
       });
     },
@@ -133,7 +131,8 @@ export default {
         //top
         let top =
           this.albums[index].position.top *
-          (this.stack.height - t.clientHeight);
+          // (this.stack.height - t.clientHeight);
+          this.stack.height;
         t.style.left = Math.floor(left).toString() + "px";
         t.style.top = Math.floor(top).toString() + "px";
       });
@@ -166,37 +165,28 @@ export default {
   },
   mounted() {
     this.getAlbums();
-    window.addEventListener("resize", this.handleResize);
-    window.addEventListener("beforeunload", this.leaving);
-    EventBus.$on("album-db-changed", this.getAlbums);
+    Bus.$on("window-resize", this.handleResize);
+    Bus.$on("album-db-changed", this.getAlbums);
+    Bus.$on("log-out", this.getAlbums);
   },
   updated() {
     this.handleResize();
   },
   beforeDestroy() {
-    window.removeEventListener("resize", this.handleResize);
-    window.removeEventListener("beforeunload", this.leaving);
-    EventBus.$off("album-db-changed", this.getAlbums);
-    this.leaving();
+    Bus.$off("album-db-changed", this.getAlbums);
+    Bus.$off("window-resize", this.handleResize);
+    Bus.$off("log-out", this.getAlbums);
   },
   components: {
-    SweetModal,
-    SweetModalTab,
-    PostForm,
-    Multifile,
     Album
   }
 };
 </script>
 
 <style lang="scss">
-section.has-text-centered {
-  display: flex;
-  flex-flow: column;
-  justify-content: center;
-  align-items: center;
+.overlay_item {
+  z-index: 100;
 }
-
 .photo_container {
   width: 100%;
   max-width: 100%;
@@ -218,13 +208,12 @@ section.has-text-centered {
   position: relative;
   img {
     position: absolute;
-    max-height: 520px;
+    max-height: 80vh;
   }
 }
 
 .nav_side {
-  overflow-x: hidden;
-  padding-top: 60px;
+  padding-top: 10%;
   display: inline;
   transition: 0.5s;
 
@@ -237,25 +226,18 @@ section.has-text-centered {
     flex-direction: row;
     display: flex;
     width: 150px;
+    height: 30px;
+    transition: 0.35s;
 
-    a.link {
-      padding: 0;
+    &:hover {
+      padding-left: 10px;
+      a {
+        color: lightgrey;
+      }
     }
 
     a {
-      text-decoration: none;
-      font-size: 16px;
       color: grey;
-      display: block;
-      transition: 0.3s;
-      text-align: start;
-      max-width: 100px;
-
-      &:hover {
-        color: lightgrey;
-        padding-left: 10px;
-      }
-      cursor: pointer;
     }
   }
 

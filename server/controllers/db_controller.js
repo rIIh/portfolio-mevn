@@ -61,7 +61,7 @@ module.exports = {
                 next(err);
             } else {
                 if (userInfo === null) {
-                    res.json({
+                    res.status(401).json({
                         status: "error",
                         message: "Invalid email/password!!!",
                         data: null

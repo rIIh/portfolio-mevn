@@ -1,4 +1,4 @@
-const axios = require('axios')
+const axios = require("axios");
 
 export async function getAlbums() {
     const response = await axios.get("api/albums").catch(e => console.log(e));
@@ -7,46 +7,55 @@ export async function getAlbums() {
 
 export async function updateAlbums(albums) {
     const response = await axios.put("api/albums", albums);
-    console.log(response);
+    return response;
 }
 
-export async function updateAlbum(album, was) {
+export async function updateAlbum(album) {
+    return updateAlbums([album]);
+}
+
+export async function sendNewAlbumPhotos(id, files, onprogress) {
     var form = new FormData();
-    form.append("name", album.name);
-    form.append("coverIndex", album.coverIndex);
-    album.photos.forEach((e, i) => {
-        console.log(e.path)
-        if (e.file === undefined)
-            form.append('photos[' + i + ']', e.path);
-        else form.append('files[' + i + ']', e.file)
+    files.forEach((f, i) => {
+        form.append("files[" + i + "]", f);
     });
-    // form.append('photos', album.photos);
-    const response = await axios.put("api/albums/" + was.name, form, {
+    var response = await axios.post("api/albums/" + id + "/photos_post", form, {
         headers: {
-            'Content-Type': 'multipart/form-data'
+            "Content-Type": "multipart/form-data"
+        },
+        onUploadProgress: data => {
+            let percent = Math.floor((data.loaded * 100) / data.total);
+            onprogress(percent);
         }
     });
-    console.log(response);
-    return response
+    return response;
 }
 
-export async function uploadAlbum(album) {
+export async function uploadAlbum(album, onprogress, explode) {
     var form = new FormData();
     form.append("name", album.name);
     form.append("coverIndex", album.coverIndex);
+    if (explode) {
+        album.photos.forEach((e) => {
+            form.append("files[0]", e.file);
+        });
+    }
     album.photos.forEach((e, i) => {
-        console.log(e.file)
-        form.append('files[' + i + ']', e.file);
+        form.append("files[" + i + "]", e.file);
     });
     const response = await axios.post("api/albums/", form, {
         headers: {
-            'Content-Type': 'multipart/form-data'
+            "Content-Type": "multipart/form-data"
+        },
+        onUploadProgress: data => {
+            let percent = Math.floor(data.loaded / data.total);
+            onprogress(percent);
         }
     });
     return response;
 }
 
 export async function removeAlbum(album) {
-    var response = await axios.delete('api/albums/' + album.name);
-    return response
+    var response = await axios.delete("api/albums/" + album.name);
+    return response;
 }

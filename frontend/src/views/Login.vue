@@ -1,15 +1,15 @@
 <template lang="pug">
-    .test
-        h1 Login
-        form(v-if="!isAuth")
+    v-layout(fill-height align-center justify-center)
+      v-flex(shrink)
+        form.form-container(v-if="!isAuth" @submit.prevent="login")
+          v-layout.login-form(align-center justify-center column fill-height)
+            .main-text Login
             input(name="username" v-model="username" placeholder="username" required autofocus)
-            br
             input(name="password" v-model="password" placeholder="password" type="password" required)
-            br
-            button(@click.prevent="login") Sign in
+            r-btn(@click="login") Sign in
         template(v-else)
-          h1 Already authenticated
-          v-btn(round dark primary @click="logout") Log out
+          .main-text Already authenticated
+          r-btn( @click="logout") Log out
 </template>
 
 
@@ -29,13 +29,6 @@ export default {
     }
   },
   methods: {
-    // async login() {
-    //   this.res = await this.$axios.post("/api/admin/auth", {
-    //     username: this.username,
-    //     password: this.password
-    //   });
-    //   this.data = this.res.data;
-    // },
     login() {
       const { username, password } = this;
       this.$store.dispatch(C.AUTH_REQUEST, { username, password }).then(() => {
@@ -43,29 +36,27 @@ export default {
       });
     },
 
-    logout() {
-      this.$store.dispatch(C.AUTH_LOGOUT);
+    async logout() {
+      await this.$store.dispatch(C.AUTH_LOGOUT);
+      this.$forceUpdate();
     }
-    // login() {
-    //   C.myLoginRoutine(
-    //     {
-    //       username: this.username,
-    //       password: this.password
-    //     },
-    //     this.$axios
-    //   ).then(() => {
-    //     this.$router.push("/");
-    //   });
-    // }
   }
 };
 </script>
 
-<style lang="scss" scoped>
-h1 {
-  color: black;
-}
-input {
-  background-color: darkgrey;
+<style lang="scss">
+.form-container {
+  // height: 200px;
+  // width: 200px;
+  input {
+    display: block !important;
+    border: 1px solid black;
+    margin: 8px;
+    padding: 4px;
+  }
+  * {
+    width: 100%;
+    height: 32px;
+  }
 }
 </style>
