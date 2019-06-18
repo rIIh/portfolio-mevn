@@ -12,18 +12,43 @@
     color: black;
 }
 
+.unselectable {
+    -webkit-user-select: none;
+    /* Safari */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* IE10+/Edge */
+    user-select: none;
+    /* Standard */
+}
+
+.disable-select,
+.unselectable {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    * {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+}
+
+
+.v-dialog {
+    border-radius: 0px;
+}
+
 .centered {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 
-    // @each $i in $vertical {
-    //     &.move-#{$i} {
-    //         $i-prct: $i + '%';
-    //         transform: translate(-50%, -#{$i-prct}) !important;
-    //     }
-    // }
     @for $i from 1 through 100 {
         $i-prct: $i + '%';
 

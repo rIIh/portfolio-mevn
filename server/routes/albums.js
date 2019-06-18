@@ -68,15 +68,13 @@ function parsePhotos(req, next) {
     try {
         form.parse(req)
             .on('file', (name, file) => {
-                console.log(file)
                 photos.push({
                     path: file.path.substring(file.path.indexOf('photos')),
                     hash: file.hash,
                 })
             })
-            .on('field', (name, field) => {
-                console.log(name, field)
-            })
+            .on('field', (name, field) => {})
+            .on('aborted', () => console.log('aborted', form))
             .on('error', (err) => console.log(err))
             .on('end', () => {
                 next(photos);
@@ -87,7 +85,7 @@ function parsePhotos(req, next) {
 }
 
 router.put('/', function (req, res, next) {
-    if (!req.body.authenticated) res.status(401).send();
+    if (!req.connection.authenticated) res.status(401).send();
     let queue = []
     req.body.forEach(album => {
         queue.push({
@@ -104,7 +102,7 @@ router.put('/', function (req, res, next) {
 })
 
 router.delete('/:name', function (req, res, next) {
-    if (!req.body.authenticated) res.status(401).send();
+    if (!req.connection.authenticated) res.status(401).send();
     DAO.AlbumDAO.deleteOne({
         name: req.params.name
     }, console.log)
@@ -112,7 +110,7 @@ router.delete('/:name', function (req, res, next) {
 })
 
 router.post('/', (req, res) => {
-    if (!req.body.authenticated) res.status(401).send();
+    if (!req.connection.authenticated) res.status(401).send();
     parseAlbum(req, album => {
         DAO.AlbumDAO.findOne({
             name: album.name
@@ -129,7 +127,7 @@ router.post('/', (req, res) => {
 })
 
 router.post('/:id/photos_post', (req, res) => {
-    if (!req.body.authenticated) res.status(401).send();
+    if (!req.connection.authenticated) res.status(401).send();
     if (req.params.id === undefined) res.status(404).send('nothing')
     parsePhotos(req, photos => {
 

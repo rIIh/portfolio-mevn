@@ -24,7 +24,6 @@ function parseForm(req, next) {
                 }
                 case 'payload': {
                     let entries = Object.entries(JSON.parse(field));
-                    console.log(entries)
                     entries.forEach(val => {
                         value[val[0]] = val[1]
                     });
@@ -38,7 +37,6 @@ function parseForm(req, next) {
         })
         .on('aborted', () => console.log('aborted'))
         .on('end', () => {
-            console.log(value)
             next(value);
         })
 }
@@ -54,18 +52,21 @@ router.get('/:name', function (req, res) {
 });
 
 router.put('/:name', function (req, res) {
-    if (!req.body.authenticated) res.status(401).send();
+    if (!req.connection.authenticated) res.status(401).send();
+    console.log(req.body)
+    let data = req.body;
+    if (data.parse) data.value = JSON.parse(data.value);
     DAO.SettingsDAO.findOneAndUpdate({
         name: req.params.name,
     }, {
-        value: req.body
+        value: data.value
     }, {
         upsert: true
     }, (err, result) => res.send(result))
 })
 
 router.delete('/:name', function (req, res) {
-    if (!req.body.authenticated) res.status(401).send();
+    if (!req.connection.authenticated) res.status(401).send();
     DAO.SettingsDAO.deleteOne({
         name: req.params.name
     }, err => console.log(err));
@@ -73,7 +74,7 @@ router.delete('/:name', function (req, res) {
 })
 
 router.post('/:name', function (req, res) {
-    if (!req.body.authenticated) res.status(401).send();
+    if (!req.connection.authenticated) res.status(401).send();
     parseForm(req, value => {
         DAO.SettingsDAO.findOneAndUpdate({
             name: req.params.name,

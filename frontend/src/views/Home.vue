@@ -35,6 +35,10 @@ export default {
     },
     applyStyles(clear) {
       if (clear === undefined) clear = false;
+      if (clear) {
+        this.$store.dispatch(C.THEME_CHANGE, 255);
+        return;
+      }
       if (this.background === "none") return;
       this.$store.dispatch(
         C.THEME_CHANGE,

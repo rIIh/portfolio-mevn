@@ -1,8 +1,8 @@
 <template lang="pug">
-    button.custom-btn(:class="(pressed ? 'pressed ' : '') + theme" @click="$emit('click')")
-        span(v-show="!loading")
-            slot()
-        v-progress-linear.progress.ma-0(v-if="loading" :indeterminate="!!progress" :value="progress")
+    button.custom-btn(:class="(pressed ? 'pressed ' : ' ') + theme + ' ' + (disabled ? 'disabled' : ' ')" @click="$emit('click')")
+        span(:class="loading ? 'invisible' : ''")
+            slot(v-show="!loading")
+        v-progress-linear.progress.ma-0(v-show="loading" :indeterminate="!!progress" color="black" :value="progress")
 </template>
 
 
@@ -20,18 +20,27 @@ export default {
     loading: Boolean,
     progress: Number,
     pressed: Boolean,
+    disabled: Boolean,
     classes: ""
   }
 };
 </script>
 
 <style lang="scss" scoped>
+.invisible {
+  opacity: 0;
+  transition: 0.2s;
+  * {
+    opacity: 0;
+  }
+}
 .custom-btn {
   border: 1px solid black;
   position: relative;
   color: black;
   margin: 6px;
   min-height: 32px;
+  opacity: 1;
   min-width: 32px;
   padding: 0.5ex 2em;
   vertical-align: super !important;
@@ -61,19 +70,19 @@ export default {
         color: black !important;
       }
     }
-    &:disabled {
+    &.disabled {
       color: lightgrey;
       border: 1px solid lightgrey;
       * {
         color: lightgrey;
       }
     }
-    &:hover:disabled {
+    &:hover.disabled {
       border: 1px solid lightgrey;
       background: lightgrey;
-      color: black;
+      color: lightgrey;
       * {
-        color: black;
+        color: lightgrey;
       }
     }
     &:focus {
@@ -82,7 +91,7 @@ export default {
   }
 
   &.pressed,
-  &:hover:enabled {
+  &:hover {
     border: 1px solid black;
     background: black;
     color: white;
@@ -90,20 +99,16 @@ export default {
       color: white;
     }
   }
-  &:disabled {
+  &.disabled {
     color: grey;
     border: 1px solid grey;
     * {
       color: grey;
     }
   }
-  &:hover:disabled {
-    border: 1px solid grey;
-    background: grey;
-    color: white;
-    * {
-      color: white;
-    }
+  &:hover.disabled {
+    background: lightgrey;
+    cursor: default;
   }
   &:focus {
     outline: 0;

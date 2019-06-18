@@ -17,7 +17,7 @@ v-card
                         r-btn.ma-0(@click="pickFile") Select image
                     v-spacer(v-else)
                     v-flex(shrink)
-                        r-btn.ma-0(@click="setValue()" :loading="busyVal" :disabled="initial === value || busyVal") Set
+                        r-btn.ma-0(@click="setValue" :loading="busyVal" :disabled="waitForData") Set
 
             
 </template>
@@ -41,6 +41,9 @@ export default {
     assetsPath() {
       let path = process.env.VUE_APP_ASSETS_PATH;
       return path === undefined ? "" : path;
+    },
+    waitForData() {
+      return this.initial.hash === this.value.hash || this.busyVal;
     }
   },
   props: {
@@ -81,6 +84,7 @@ export default {
       });
     },
     async setValue() {
+      if (this.waitForData) return;
       this.busy(true);
       var response = {};
       switch (this.type) {

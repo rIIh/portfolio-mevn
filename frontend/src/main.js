@@ -13,14 +13,30 @@ import EvaIcons from "vue-eva-icons";
 import VTooltip from "v-tooltip";
 import ScrollBar from "vue2-scrollbar";
 import RBtn from "./components/RBtn";
-import CKEditor from "@ckeditor/ckeditor5-vue";
+
+const context = {
+  store,
+  router,
+}
+
+import VuetifyDialog from 'vuetify-dialog'
+Vue.use(VuetifyDialog, {
+  context: context
+})
+
+import VueQuillEditor from "vue-quill-editor";
+
+// require styles
+import "quill/dist/quill.core.css";
+import "quill/dist/quill.snow.css";
+import "quill/dist/quill.bubble.css";
+
+Vue.use(VueQuillEditor /* { default global options } */ );
 
 Vue.use(EvaIcons);
 Vue.use(Vuetify);
 Vue.use(VTooltip);
 Vue.use(ScrollBar);
-Vue.use(require("vue-moment"));
-Vue.use(CKEditor);
 
 import upperFirst from "lodash/upperFirst";
 import camelCase from "lodash/camelCase";
@@ -43,9 +59,9 @@ requireComponent.keys().forEach(fileName => {
     camelCase(
       // Получаем имя файла независимо от глубины вложенности
       fileName
-        .split("/")
-        .pop()
-        .replace(/\.\w+$/, "")
+      .split("/")
+      .pop()
+      .replace(/\.\w+$/, "")
     )
   );
 

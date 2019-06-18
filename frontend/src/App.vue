@@ -1,5 +1,5 @@
 <template lang="pug">
-  v-app#app(:class="heightBlocked ? 'block-height' : ''" )
+  v-app#app()
     v-navigation-drawer(absolute v-model="tools" v-if="breakpoint.smAndDown && isAuth")
       v-list
         v-list-tile(@click="adminChange")
@@ -27,7 +27,7 @@
           span.no-wrap.px-3
             //- button.darkify.custom-btn.px-3(:class="adminMode ? 'pressed' : 'depressed'" @click="adminChange") admin mode
             r-btn.px-3(:pressed="adminMode" @click="adminChange") admin mode
-            r-btn.px-3(@click="post = !post") post album
+            r-btn.px-3(@click="openEditor") post album
             r-btn.px-3(@click="logout") log out
             r-btn.pa-0()
               v-icon.material-icons-outlined(small) settings
@@ -37,12 +37,7 @@
       v-container(fluid fill-height)
         v-flex(fill-height)
           router-view.view(@block-height="heightBlocked = true" @unblock-height="heightBlocked = false")
-
-
-    v-dialog(v-model="post" :persistent="uploading" lazy max-width="450px")
-      album(@uploaded="post = !post; showMessage()" @busy="uploading = true" @unbusy="uploading = false") Upload new album
-    v-snackbar(color="primary" v-model="success") Album successully uploaded
-      v-btn(dark flat @click.native="success = false") Close
+          
 </template>
 
 <script>
@@ -54,77 +49,83 @@ import { Bus } from "./event-bus";
 const C = require("./api/consts");
 
 export default {
-  data() {
-    return {
-      post: false,
-      success: false,
-      uploading: false,
-      heightBlocked: false,
-      tools: false
-    };
-  },
-  computed: {
-    adminMode() {
-      return this.$store.getters.isSuper;
+    data() {
+        return {
+            post: false,
+            uploading: false,
+            tools: false
+        };
     },
-    isAuth() {
-      return this.$store.getters.isAuthenticated;
-    },
-    breakpoint() {
-      return this.$vuetify.breakpoint;
-    }
-  },
-  methods: {
-    link() {
-      let target = this.$router.currentRoute.name === "home" ? "/gallery" : "/";
-      return target;
-    },
-    showMessage() {
-      this.success = true;
-      setTimeout(() => (this.success = false), 2000);
-    },
-    adminChange() {
-      this.$store.dispatch(C.ADMIN_MODE_SWAP);
-    },
-    async logout() {
-      await this.$store.dispatch(C.AUTH_LOGOUT);
-      console.log("logut");
-      Bus.$emit("log-out");
-    },
-    resize(data) {
-      let s = data.target.screen;
-      Bus.$emit("window-resize");
-      this.$store.dispatch(C.RESIZE, {
-        availHeight: s.availHeight,
-        height: s.height,
-        orientation: {
-          angle: s.orientation.angle,
-          type: s.orientation.type
+    computed: {
+        adminMode() {
+            return this.$store.getters.isSuper;
+        },
+        isAuth() {
+            return this.$store.getters.isAuthenticated;
+        },
+        breakpoint() {
+            return this.$vuetify.breakpoint;
         }
-      });
-    }
-  },
-  created: function() {
-    Axios.interceptors.response.use(undefined, function(err) {
-      return new Promise(function(resolve, reject) {
-        if (err.status === 401 && err.config && !err.config.__isRetryRequest) {
-          // if you ever get an unauthorized, logout the user
-          this.$store.dispatch(AUTH_LOGOUT);
-          // you can also redirect to /login if needed !
+    },
+    methods: {
+        openEditor() {
+            this.$dialog.show(Album);
+        },
+        link() {
+            let target =
+                this.$router.currentRoute.name === "home" ? "/gallery" : "/";
+            return target;
+        },
+        showMessage() {
+            this.success = true;
+            setTimeout(() => (this.success = false), 2000);
+        },
+        adminChange() {
+            this.$store.dispatch(C.ADMIN_MODE_SWAP);
+        },
+        async logout() {
+            await this.$store.dispatch(C.AUTH_LOGOUT);
+            console.log("logut");
+            Bus.$emit("log-out");
+        },
+        resize(data) {
+            let s = data.target.screen;
+            Bus.$emit("window-resize");
+            this.$store.dispatch(C.RESIZE, {
+                availHeight: s.availHeight,
+                height: s.height,
+                orientation: {
+                    angle: s.orientation.angle,
+                    type: s.orientation.type
+                }
+            });
         }
-      });
-    });
-  },
-  mounted() {
-    window.addEventListener("resize", this.resize);
-    this.resize({ target: window });
-  },
-  beforeDestroy() {
-    window.removeEventListener("resize", this.resize);
-  },
-  components: {
-    Navigation,
-    Album
-  }
+    },
+    created: function() {
+        Axios.interceptors.response.use(undefined, function(err) {
+            return new Promise(function(resolve, reject) {
+                if (
+                    err.status === 401 &&
+                    err.config &&
+                    !err.config.__isRetryRequest
+                ) {
+                    // if you ever get an unauthorized, logout the user
+                    this.$store.dispatch(AUTH_LOGOUT);
+                    // you can also redirect to /login if needed !
+                }
+            });
+        });
+    },
+    mounted() {
+        window.addEventListener("resize", this.resize);
+        this.resize({ target: window });
+    },
+    beforeDestroy() {
+        window.removeEventListener("resize", this.resize);
+    },
+    components: {
+        Navigation,
+        Album
+    }
 };
 </script>

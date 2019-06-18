@@ -58,5 +58,8 @@ export default {
     width: 100%;
     height: 32px;
   }
+  &:focus {
+    outline: 0;
+  }
 }
 </style>
