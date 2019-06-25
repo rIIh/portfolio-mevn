@@ -7,7 +7,7 @@
             v-checkbox(v-model="adminMode" readonly)
           v-list-tile-content 
             v-list-tile-title admin mode
-        v-list-tile(@click="post = !post; tools = false")
+        v-list-tile(@click="openEditor(); tools = false")
           v-list-tile-action
             v-icon.material-icons-outlined attachment
           v-list-tile-content 
@@ -22,7 +22,7 @@
       v-flex(shrink)
         v-icon.pr-3(@click.stop="tools = !tools" v-if="breakpoint.smAndDown && isAuth") menu
         router-link(:to="link()" class="main link")
-          h1.brand(:class="$store.getters.theme" :style="breakpoint.smAndDown ? 'font-size: 24px' : ''") Yura&nbsp;Taralov
+          h1.brand(:class="$store.getters.theme" :style="breakpoint.smAndDown ? 'font-size: 24px' : ''") Yura&#160;Taralov
         template(v-if="isAuth && breakpoint.mdAndUp")
           span.no-wrap.px-3
             //- button.darkify.custom-btn.px-3(:class="adminMode ? 'pressed' : 'depressed'" @click="adminChange") admin mode
@@ -30,9 +30,9 @@
             r-btn.px-3(@click="openEditor") post album
             r-btn.px-3(@click="logout") log out
             r-btn.pa-0()
-              v-icon.material-icons-outlined(small) settings
+              v-icon.material-icons-outlined(small @click="") settings
       v-flex(shrink)
-        router-link.link.about(to="/about") Contacts
+        router-link.link.about(to="/about" :class="$store.getters.theme") Contacts
     v-content
       v-container(fluid fill-height)
         v-flex(fill-height)
@@ -76,16 +76,11 @@ export default {
                 this.$router.currentRoute.name === "home" ? "/gallery" : "/";
             return target;
         },
-        showMessage() {
-            this.success = true;
-            setTimeout(() => (this.success = false), 2000);
-        },
         adminChange() {
             this.$store.dispatch(C.ADMIN_MODE_SWAP);
         },
         async logout() {
             await this.$store.dispatch(C.AUTH_LOGOUT);
-            console.log("logut");
             Bus.$emit("log-out");
         },
         resize(data) {

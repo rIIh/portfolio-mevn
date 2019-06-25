@@ -17,7 +17,7 @@ export async function removeValue(name) {
     const response = await axios
         .delete(api_path + name)
         .catch(e => console.log(e));
-    return response.data;
+    return response;
 }
 
 export async function setValueWithFile(name, type, file, payload) {
@@ -36,5 +36,5 @@ export async function setValueWithFile(name, type, file, payload) {
             }
         })
         .catch(e => console.log(e));
-    return response.data;
+    return response;
 }

@@ -3,29 +3,12 @@ import Router from "vue-router";
 import Gallery from "./views/Gallery";
 import Login from "./views/Login";
 import Album from "./views/AlbumPage";
-import Home from "./views/Home";
+
 
 import store from "./store";
 const C = require("./api/consts");
 
 Vue.use(Router);
-
-// // ? Maybe not
-// const ifNotAuthenticated = (to, from, next) => {
-//   if (!store.getters.isAuthenticated) {
-//     next()
-//     return
-//   }
-//   next('/')
-// }
-
-// const ifAuthenticated = (to, from, next) => {
-//   if (store.getters.isAuthenticated) {
-//     next()
-//     return
-//   }
-//   next('/login')
-// }
 
 const router = new Router({
   mode: "history",
@@ -34,32 +17,28 @@ const router = new Router({
     {
       path: "/",
       name: "home",
-      component: Home
+      component: () => import('./views/Home.vue')
     },
     {
       path: "/gallery",
       name: "gallery",
-      component: Gallery
+      component: () => import('./views/Gallery.vue')
     },
     {
       path: "/login",
       name: "login",
-      component: Login
+      component: () => import('./views/Login.vue')
     },
     {
       path: "/album_:id",
       name: "album",
-      component: Album,
+      component: () => import('./views/AlbumPage.vue'),
       props: true
     },
     {
       path: "/about",
       name: "about",
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () =>
-        import(/* webpackChunkName: "about" */ "./views/About.vue")
+      component: () => import("./views/About.vue")
     }
   ]
 });

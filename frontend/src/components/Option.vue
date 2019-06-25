@@ -1,23 +1,24 @@
 <template lang="pug">
-v-card
-    v-card-title
-        v-container.pb-0(grid-list-md)
-            v-layout(justify-start)
+.card(style="background: white")
+    .v-card__title
+        .container.grid-list-md.pb-0()
+            .layout.justify-start
                 span.headline
                     slot
-    v-card-text
-        v-container.pt-0(grid-list-md)
+    .v-card__text
+        .container.grid-list-md.pt-0()
             img.opt_img(v-if="type === 'image' && value !== 'none'" :src="file ? value.path : assetsPath + value.path" alt="background image")
             //- v-text-field(v-if="type === 'string'")
             input(v-if="type === 'file' || type === 'image'" type="file" v-show="type === 'file'" ref="file_picker" :accept="type === 'image' ? 'image/*' : ''" @change="onFilePicked")
-            v-layout.pt-4(:justify-space-between="true" fluid)
-                    v-flex(shrink)
-                        r-btn.ma-0(@click.prevent="clear") Remove
-                    v-flex(shrink v-if="type=== 'image'")
-                        r-btn.ma-0(@click="pickFile") Select image
-                    v-spacer(v-else)
-                    v-flex(shrink)
-                        r-btn.ma-0(@click="setValue" :loading="busyVal" :disabled="waitForData") Set
+            .layout.justify-space-between.fluid.pt-4
+                    .flex.shrink(v-if="initial !== 'none'")
+                        r-btn.ma-0(ignoreTheme @click="clear" ) Remove
+                    .spacer(v-else)
+                    .flex.shrink(v-if="type=== 'image'")
+                        r-btn.ma-0(ignoreTheme @click="pickFile") Select image
+                    .spacer(v-else)
+                    .flex.shrink
+                        r-btn.ma-0(ignoreTheme @click="setValue" :loading="busyVal" :disabled="waitForData") Set
 
             
 </template>
@@ -43,7 +44,7 @@ export default {
       return path === undefined ? "" : path;
     },
     waitForData() {
-      return this.initial.hash === this.value.hash || this.busyVal;
+      return (this.value.hash !== undefined || this.value === 'none') || this.busyVal;
     }
   },
   props: {
@@ -57,6 +58,9 @@ export default {
         this.refresh();
       }
     }
+  },
+  mounted() {
+    this.refresh();
   },
   methods: {
     busy(value) {
@@ -110,30 +114,20 @@ export default {
           break;
       }
       this.busy(false);
-      this.$emit("done");
+      this.$emit("submit");
       this.refresh();
     },
     async clear() {
       this.busy(true);
       var response = await api.removeValue(this.property).catch(err => {
         this.busy(false);
-        console.log(err);
       });
       if (response.status === 200) {
-        this.$emit("done");
+        this.$emit("submit");
+        console.log(response)
       }
       this.busy(false);
       this.refresh();
-      //   this.$refs.form.validate();
-      //   if (this.valid) {
-      //     var response = await Api.uploadAlbum(this.model, this.$axios).catch(
-      //       err => {
-      //         if (err.status === 400) {
-      //         }
-      //       }
-      //     );
-      //     if (response.status === 200) this.$emit("uploaded");
-      //   }
     }
   }
 };

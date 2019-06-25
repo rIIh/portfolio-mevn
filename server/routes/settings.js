@@ -53,7 +53,6 @@ router.get('/:name', function (req, res) {
 
 router.put('/:name', function (req, res) {
     if (!req.connection.authenticated) res.status(401).send();
-    console.log(req.body)
     let data = req.body;
     if (data.parse) data.value = JSON.parse(data.value);
     DAO.SettingsDAO.findOneAndUpdate({

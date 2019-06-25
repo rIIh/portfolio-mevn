@@ -1,19 +1,12 @@
 <template lang="pug">
   #about
-    r-btn(v-if="adminMode" @click="showBackgroundEditor = !showBackgroundEditor") Change background image
+    r-btn(v-if="adminMode" @click="openBackgroundEditor") Change background image
     r-btn(v-if="adminMode" @click="showAboutEditor = !showAboutEditor") Edit text
-    //- ckeditor(v-if="showAboutEditor" :editor="editor" v-model="editorData" :config="editorConfig")
-    //- @blur="onEditorBlur($event)"
-    //- @focus="onEditorFocus($event)"
-    //- @ready="onEditorReady($event)"
     .editor-container(v-if="showAboutEditor && adminMode")
-      quill-editor(ref="myTextEditor" v-model="content" :options="editorOption")
+        quill-editor(ref="myTextEditor" v-model="content" :options="editorOption")
+        // r-async-editor()
                       
-    span(v-html="content")
-
-
-    v-dialog(v-model="showBackgroundEditor" max-width="450px" :persistent="uploading")
-          voption(:opened="showBackgroundEditor" type="image" property="about_background" @done="getBG" @busy="uploading = true" @unbusy="uploading = false")
+    span.about-content(v-html="content")
 </template>
 
 <script>
@@ -33,9 +26,7 @@ export default {
             background: "",
             initial: "",
             uploading: false,
-            showBackgroundEditor: false,
             showAboutEditor: false,
-
             content: ``,
             editorOption: {
                 theme: "snow",
@@ -77,6 +68,14 @@ export default {
         }
     },
     methods: {
+        async openBackgroundEditor(){
+            await this.$dialog.show(voption, {
+                type: 'image',
+                property: "about_background",
+                waitForResult: true
+            });
+            this.getBG()
+        },
         async saveContent() {
             let res = await api.setValue("about_content", {
                 parse: true,
@@ -102,11 +101,10 @@ export default {
         },
         applyStyles(clear) {
             if (clear === undefined) clear = false;
-            if (clear) {
+            if (clear || this.background === 'none') {
                 this.$store.dispatch(C.THEME_CHANGE, 255);
                 return;
             }
-            if (this.background === "none") return;
             this.$store.dispatch(
                 C.THEME_CHANGE,
                 this.background.luminosity.brightness
@@ -137,32 +135,22 @@ export default {
 </script>
 
 <style lang="sass">
-.ql-snow.ql-toolbar button:hover
-  color: black
 .ql-save
   width: 48px !important
 .ql-save:after
   content: 'Save'
-  
 
 .editor-container
   background: white
-.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke, .ql-snow.ql-toolbar button.ql-active .ql-stroke
-  stroke: white !important
-  background: black !important
 
-.ql-snow.ql-toolbar .ql-picker-label.ql-active, .ql-snow.ql-toolbar button.ql-active, .ql-snow.ql-toolbar button:hover
-  color: white !important
-  background: black !important 
-
-.ql-snow.ql-toolbar button.ql-active
-  .ql-fill
-    fill: white !important
-  background: black !important
-
-.ql-active
-  color: white
-  fill: white
-  background: black
+.ql-snow.ql-toolbar button:hover .ql-fill, .ql-snow .ql-toolbar button:hover .ql-fill, .ql-snow.ql-toolbar button:focus .ql-fill, .ql-snow .ql-toolbar button:focus .ql-fill, .ql-snow.ql-toolbar button.ql-active .ql-fill, .ql-snow .ql-toolbar button.ql-active .ql-fill, .ql-snow.ql-toolbar .ql-picker-label:hover .ql-fill, .ql-snow .ql-toolbar .ql-picker-label:hover .ql-fill, .ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-fill, .ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-fill, .ql-snow.ql-toolbar .ql-picker-item:hover .ql-fill, .ql-snow .ql-toolbar .ql-picker-item:hover .ql-fill, .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-fill, .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-fill, .ql-snow.ql-toolbar button:hover .ql-stroke.ql-fill, .ql-snow .ql-toolbar button:hover .ql-stroke.ql-fill, .ql-snow.ql-toolbar button:focus .ql-stroke.ql-fill, .ql-snow .ql-toolbar button:focus .ql-stroke.ql-fill, .ql-snow.ql-toolbar button.ql-active .ql-stroke.ql-fill, .ql-snow .ql-toolbar button.ql-active .ql-stroke.ql-fill, .ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke.ql-fill, .ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke.ql-fill, .ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke.ql-fill, .ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke.ql-fill, .ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke.ql-fill, .ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke.ql-fill, .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill, .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill
+    fill: white
+    background: black
+.ql-snow.ql-toolbar button:hover .ql-stroke, .ql-snow .ql-toolbar button:hover .ql-stroke, .ql-snow.ql-toolbar button:focus .ql-stroke, .ql-snow .ql-toolbar button:focus .ql-stroke, .ql-snow.ql-toolbar button.ql-active .ql-stroke, .ql-snow .ql-toolbar button.ql-active .ql-stroke, .ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke, .ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke, .ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke, .ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke, .ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke, .ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke, .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke, .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke, .ql-snow.ql-toolbar button:hover .ql-stroke-miter, .ql-snow .ql-toolbar button:hover .ql-stroke-miter, .ql-snow.ql-toolbar button:focus .ql-stroke-miter, .ql-snow .ql-toolbar button:focus .ql-stroke-miter, .ql-snow.ql-toolbar button.ql-active .ql-stroke-miter, .ql-snow .ql-toolbar button.ql-active .ql-stroke-miter, .ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke-miter, .ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke-miter, .ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke-miter, .ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke-miter, .ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke-miter, .ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke-miter, .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter, .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter
+    stroke: white
+    background: black
+.ql-snow.ql-toolbar button:hover, .ql-snow .ql-toolbar button:hover, .ql-snow.ql-toolbar button:focus, .ql-snow .ql-toolbar button:focus, .ql-snow.ql-toolbar button.ql-active, .ql-snow .ql-toolbar button.ql-active, .ql-snow.ql-toolbar .ql-picker-label:hover, .ql-snow .ql-toolbar .ql-picker-label:hover, .ql-snow.ql-toolbar .ql-picker-label.ql-active, .ql-snow .ql-toolbar .ql-picker-label.ql-active, .ql-snow.ql-toolbar .ql-picker-item:hover, .ql-snow .ql-toolbar .ql-picker-item:hover, .ql-snow.ql-toolbar .ql-picker-item.ql-selected, .ql-snow .ql-toolbar .ql-picker-item.ql-selected
+    color: white
+    background: black
 </style>
 

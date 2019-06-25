@@ -6,12 +6,9 @@
   "scripts": {
     "front:build": "npm run --prefix frontend build",
     "front:watch": "npm run --prefix frontend build --watch",
-    "heroku:front": "npm run front:build && git add . && git commit -m 'deploy' && git push heroku master",
-    "heroku": "git add -A && git commit -m 'deploy' && git push heroku master",
     "start": "NODE_ENV=production node server/main.js",
     "dev": "NODE_ENV=development nodemon --ignore './frontend/' server/main.js",
-    "dev:watch": "npm run dev & npm run front:watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev:watch": "npm run dev & npm run front:watch"
   },
   "keywords": [
     "site",

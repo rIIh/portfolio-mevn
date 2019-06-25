@@ -2,8 +2,22 @@
     color: black;
 
     &.theme--dark {
-        color: white;
+        color: white !important;
     }
+}
+
+.relative{
+    position: relative;
+}
+
+.clear-background {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    background: white;
+    z-index: -100;
 }
 
 .main-text {
@@ -92,7 +106,7 @@ a.link {
 
     &.theme--dark {
         border: 1px solid white;
-        color: white;
+        color: white !important;
 
         * {
             color: white !important;
@@ -103,7 +117,6 @@ a.link {
             border: 1px solid white;
             background: white;
             color: black;
-
             * {
                 color: black;
             }
@@ -170,10 +183,15 @@ a.link {
 
 .brand {
     display: inline;
+    word-spacing: -10px;
 
     &.theme--dark {
         color: white;
     }
+}
+
+.v-icon {
+    transform: translate(0.5px,0.5px)
 }
 
 .force-overflow {
@@ -199,9 +217,17 @@ a.link {
     // overflow: hidden;
 }
 
+.about-content{
+    text-align: initial;
+}
+
+html{
+    overflow: hidden;
+}
+
 body {
     background-size: cover;
     background-position: center;
     -webkit-transition: background-image 0.2s ease-in-out;
-    transition: background-image 0.2s ease-in-out;
+    transition: background-image 0.6s ease-in-out;
 }

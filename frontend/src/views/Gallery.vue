@@ -1,10 +1,8 @@
 <template lang="pug">
   .home(id="scroll-target" v-scroll="onScroll" :style="breakpoint.mdAndUp ? 'max-height ' : ''")
-    v-dialog(v-model="edit" :persistent="uploading" max-width="450px")
-      album(:was="model" ref="editor" @busy="uploading = true" @unbusy="uploading = false") Edit album
-    v-layout(fill-height v-if="breakpoint.mdAndUp" row)
-      v-flex(shrink)
-        v-layout.nav_side(column fill-height)
+    .layout.fill-height.row(v-if="breakpoint.mdAndUp" )
+      .flex.shrink
+        .layout.column.fill-height.nav_side
           div(class="link_row" shrink v-for="(album, index) in albums" :key="album.name" @mouseenter="mouseEnterLink(index)" @mouseleave="mouseExitLink(index)" v-show="adminMode || !album.hidden")
             span.link-box(@mouseenter="openAndTop(index)")
               router-link(class="link" :to="'album_'+album.name")
@@ -15,12 +13,12 @@
                   v-icon.material-icons-outlined edit
                 button(@click="swapVisible(index); updateVisibility(index)" @mouseenter="openAndTop(index)")
                   v-icon.material-icons-outlined {{ !albums[index].hidden ? 'visibility' : 'visibility_off' }}
-      v-flex.pl-2(grow style="overflow: hidden; position: relative" ref="stack_parent")
+      .flex.grow.pl-2(style="overflow: hidden; position: relative" ref="stack_parent")
         .photo_container_stack(ref="photo_stack_container")
           img(v-for="(album, index) in albums" v-show="album.topped && (!album.hidden || adminMode)"  :key="index" :src="assetsPath + album.photos[album.coverIndex].path" ref="photo_stack")
 
     .photo_container(v-else)
-      v-card(flat tile v-for="(album, index) in albums" :key="albums.name" v-show="!album.hidden || adminMode"  @click.stop="hoveredIndex=index")
+      .card.flat.tile.relative(v-for="(album, index) in albums" :key="albums.name" v-show="!album.hidden || adminMode"  @click.stop="hoveredIndex=index")
         template(v-if="adminMode")
           //- transition(name="fade" v-if="adminMode")
           span.overlay.cover(v-show="hoveredIndex === index")
@@ -193,9 +191,7 @@ export default {
     transition: 0.5s;
     column-gap: 0px;
     line-height: 0px;
-
-    columns: 2;
-
+    columns: 3;
     img {
         transition: 1s;
         padding: 3px;
@@ -207,12 +203,13 @@ export default {
     height: 100%;
     width: 100%;
     position: fixed;
-    top: 50%;
+    margin-top: 20px;
+    // top: 50%;
     img {
         position: absolute;
-        transform: translateY(-50%);
+        // transform: translateY(-50%);
         min-height: 128px;
-        height: 80vh;
+        height: 80%;
         max-height: 512px;
     }
 }

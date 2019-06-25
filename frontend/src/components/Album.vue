@@ -1,31 +1,21 @@
 <template lang="pug">
-  div
+  .album-editor
     vue-scrollbar.my-scrollbar(ref="Scrollbar")
-      v-card.scroll-me
-        v-card-title
-          v-container.pb-0(grid-list-md)
-            v-layout(justify-start)
+      .card.scroll-me
+        .v-card__title
+          .container.pb-0.grid-list-md
+            .layout.justify-start
               span.headline
                 slot
-        v-card-text
-          v-container.pt-0(grid-list-md)
-            v-layout(column justify-center)
+        .v-card__text
+          .container.grid-list-md.pt-0
+            .layout.column.justify-center
               v-form(ref="form" v-model="formValid" @submit.prevent="was ? update() : upload()")
-                v-flex.pa-0()
+                .flex.pa-0()
                   v-text-field(label="Title"  v-model="model.name" ref="name" :rules="nameRules" required)
-                v-layout.photos(wrap fill-height)
-                  v-flex(v-for="(photo, index) in model.photos" xs4)
-                    //- v-card.upload_image(flat tile @mouseover.prevent="hoveredIndex = index" @mouseleave.stop="hoveredIndex = -1")
-                    //-   transition(name="fade")
-                    //-     .overlay.disable-select.cover(v-if="index === model.coverIndex && hoveredIndex !== index")
-                    //-       v-icon.material-icons-outlined() done
-                    //-     span(v-if="hoveredIndex === index")
-                    //-       .overlay.disable-select.cover(@click="model.coverIndex = index" style="height: 50%")
-                    //-         v-icon.material-icons-outlined() done
-                    //-       .overlay.disable-select.cover(@click.prevent.stop="removePhoto(index)" style="height: 50%; transform: translate(0, 100%)")
-                    //-         v-icon.material-icons-outlined() clear
-                    //-   img(:src="(editing && !photo.file) ? assetsPath + photo.path : photo.path" :key="index" width="100%" height="100%")
-                    v-card.disable-select(flat tile @click="model.coverIndex = index")
+                .layout.wrap.fill-height.photos()
+                  .flex.xs4(v-for="(photo, index) in model.photos" xs4)
+                    .card.flat.tile.disable-select.photo(@click="model.coverIndex = index")
                       transition(name="fade")
                         .overlay.cover(v-show="index === model.coverIndex")
                           v-icon.overlay_item.centered.material-icons-outlined() done
@@ -33,15 +23,14 @@
                         v-icon(dark) clear
                       img(:src="(editing && !photo.file) ? assetsPath + photo.path : photo.path" :key="index" width="100%")
                 v-alert(type="error" outline :value="model.photos[0] === undefined") At least one photo is required
-                v-layout(:justify-space-between="true" fluid)
-                  v-flex(shrink v-if="was")
-                    button.custom-btn.ma-0(@click.prevent="remove") Remove
-                  v-spacer(v-else)
-                  v-flex(shrink )
-                    button.custom-btn.ma-0(@click.prevent="pickPhotos") Select photos
-                  v-flex(shrink )
-                    r-btn.ma-0(:disabled="!valid" :loading="busyVal" :progress="busyProgress" @click="was ? update() : upload()") {{ editing ? 'Update' : 'Upload'}}
-
+                .layout.justify-space-between.fluid
+                  .flex.shrink(v-if="was")
+                    r-btn.ma-0(ignoreTheme @click="remove") Remove
+                  .spacer(v-else)
+                  .flex.shrink
+                    r-btn.ma-0(ignoreTheme @click="pickPhotos") Select photos
+                  .flex.shrink
+                    r-btn.ma-0(ignoreTheme :disabled="!valid" :loading="busyVal" :progress="busyProgress" @click="was ? update() : upload()") {{ editing ? 'Update' : 'Upload'}}
                 input(type="file" style="display: none" ref="photo_picker" multiple accept="image/*" @change="onPhotosPicked")
 </template>
 
@@ -63,7 +52,7 @@ export default {
                 photos: []
             },
             busyVal: false,
-            busyProgress: 0
+            busyProgress: 0,
         };
     },
     watch: {
@@ -81,11 +70,13 @@ export default {
         },
         editing() {
             return this.was !== undefined;
+        },
+        was(){
+            if(this.$attrs.propsData)
+            return this.$attrs.propsData.was;
         }
     },
-    props: {
-        was: Object
-    },
+
     mounted() {},
     methods: {
         busy(value) {
@@ -121,34 +112,31 @@ export default {
         },
         async upload() {
             this.$refs.form.validate();
-            if (this.busyVal || !this.formValid) return;
+            if (this.busyVal || !this.valid) return;
             this.busy(true);
 
-            if (this.valid) {
-                var response = await Api.uploadAlbum(
-                    this.model,
-                    data => (this.busyProgress = data)
-                ).catch(err => {
-                    this.busy(false);
-                    if (err.status === 400) {
-                        console.log(err);
-                    }
-                });
+            var response = await Api.uploadAlbum(
+                this.model,
+                data => (this.busyProgress = data)
+            ).catch(err => {
                 this.busy(false);
-
-                if (response.status === 200) {
-                    this.$emit("uploaded");
-                    this.$emit("done");
-                    Bus.$emit("album-db-changed");
-                    this.$dialog.message.info("Album successfully uploaded", {
-                        position: "top"
-                    });
-                    this.model = {
-                        name: "",
-                        coverIndex: 0,
-                        photos: []
-                    };
+                if (err.status === 400) {
+                    console.log(err);
                 }
+            });
+            this.busy(false);
+
+            if (response.status === 200) {
+                this.$emit("submit");
+                Bus.$emit("album-db-changed");
+                this.$dialog.message.info("Album successfully uploaded", {
+                    position: "top"
+                });
+                this.model = {
+                    name: "",
+                    coverIndex: 0,
+                    photos: []
+                };
             }
         },
         async update() {
@@ -189,9 +177,7 @@ export default {
                     if (response.status !== 200) console.log("error");
                 }
                 this.busy(false);
-
-                this.$emit("uploaded");
-                this.$emit("done");
+                this.$emit("submit");
                 Bus.$emit("album-db-changed");
                 this.$dialog.message.info("Album successfully updated", {
                     position: "top"
@@ -212,9 +198,8 @@ export default {
             );
             if (response.status === 200) {
                 this.busy(false);
-
-                this.$emit("done");
-                EventBus.$emit("album-db-changed");
+                this.$emit("submit");
+                Bus.$emit("album-db-changed");
             }
         }
     },
@@ -241,6 +226,9 @@ export default {
 }
 .photos {
     line-height: 0;
+    .photo{
+        position: relative;
+    }
 }
 
 .upload_image {
@@ -269,6 +257,7 @@ export default {
     height: 100%;
     width: 100%;
     transition: 0.5s ease;
+    z-index: 0;
 
     &.cover {
         background-color: rgba(255, 255, 255, 0.637);

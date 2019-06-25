@@ -4,3 +4,4 @@ front_tmp
 resources
 .env*
 *.log
+.env.production

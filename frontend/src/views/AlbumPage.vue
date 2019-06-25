@@ -1,11 +1,11 @@
 <template lang="pug">
-  v-layout(fill-height column justify-space-around align-content-space-between v-if="album")
-    v-flex(grow)
-      v-card(flat @click="$router.go(-1)" height="100%" style=" position: relative; overflow-y: hidden;")
-        transition(name="fade")
+  .layout.fill-height.column.justify-space-around.align-content-space-between( v-if="album")
+    .flex.grow
+      .card.flat(@click="$router.go(-1)" style="height: 100%; position: relative; overflow-y: hidden;")
+        transition(name="long-fade")
           img.photo(style="position: absolute; max-width: 100%; max-height: 100%; top: 50%; transform: translate(-50%, -50%)" :src="assetsPath + album.photos[currentIndex].path" :key="currentIndex" alt="photo" @click.stop="increment(); skip=true")
           //- img.photo(:style="orientation" style="position: absolute; top: 50%; transform: translate(-50%, -50%)" :src="assetsPath + album.photos[currentIndex].path" :key="currentIndex" alt="photo" @click.stop="increment(); skip=true")
-    v-flex(shrink)
+    .flex.shrink
       .pages.ma-3
         template(v-for="n in album.photos.length")
           span.page.unselectable.pa-2(:class="currentIndex === n - 1 ? 'active' : ''" @click.stop="currentIndex = n - 1; skip = true" :key="n") {{ n }}
@@ -77,15 +77,21 @@ export default {
     },
     mounted() {
         this.id = this.$route.params.id;
-        this.loadAlbum().then(this.next);
+        this.loadAlbum().then();
     }
 };
 </script>
 
 
 <style lang="scss">
+.long-fade-enter-active, .long-fade-leave-active {
+  transition: opacity 2s;
+}
+.long-fade-enter, .long-fade-leave-to /* .fade-leave-active до версии 2.1.8 */ {
+  opacity: 0;
+}
 .page {
-    transition: color 0.5s;
+    transition: color 1s;
     color: black;
     cursor: pointer;
     &.active {
