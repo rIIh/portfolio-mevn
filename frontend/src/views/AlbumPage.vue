@@ -1,6 +1,6 @@
 <template lang="pug">
   .layout.fill-height.column.justify-space-around.align-content-space-between( v-if="album")
-    .flex.grow
+    .flex(style="flex-grow: 4 !important")
       .card.flat(@click="$router.go(-1)" style="height: 100%; position: relative; overflow-y: hidden;")
         transition(name="long-fade")
           img.photo(style="position: absolute; max-width: 100%; max-height: 100%; top: 50%; transform: translate(-50%, -50%)" :src="assetsPath + album.photos[currentIndex].path" :key="currentIndex" alt="photo" @click.stop="increment(); skip=true")
@@ -9,7 +9,27 @@
       .pages.ma-3
         template(v-for="n in album.photos.length")
           span.page.unselectable.pa-2(:class="currentIndex === n - 1 ? 'active' : ''" @click.stop="currentIndex = n - 1; skip = true" :key="n") {{ n }}
+    .spacer
 </template>
+<style lang="scss">
+.long-fade-enter-active, .long-fade-leave-active {
+  transition: opacity 2s;
+}
+.long-fade-enter, .long-fade-leave-to /* .fade-leave-active до версии 2.1.8 */ {
+  opacity: 0;
+}
+.page {
+    transition: color 1s;
+    color: black;
+    cursor: pointer;
+    &.active {
+        color: white;
+    }
+    &:hover {
+        border-bottom: 1px solid currentColor;
+    }
+}
+</style>
 
 <script>
 function timeout(ms) {
@@ -81,24 +101,3 @@ export default {
     }
 };
 </script>
-
-
-<style lang="scss">
-.long-fade-enter-active, .long-fade-leave-active {
-  transition: opacity 2s;
-}
-.long-fade-enter, .long-fade-leave-to /* .fade-leave-active до версии 2.1.8 */ {
-  opacity: 0;
-}
-.page {
-    transition: color 1s;
-    color: black;
-    cursor: pointer;
-    &.active {
-        color: white;
-    }
-    &:hover {
-        border-bottom: 1px solid currentColor;
-    }
-}
-</style>

@@ -1,12 +1,12 @@
 <template lang="pug">
-  .home(id="scroll-target" v-scroll="onScroll" :style="breakpoint.mdAndUp ? 'max-height ' : ''")
+  .home(:style="breakpoint.mdAndUp ? 'max-height ' : ''")
     .layout.fill-height.row(v-if="breakpoint.mdAndUp" )
       .flex.shrink
         .layout.column.fill-height.nav_side
           div(class="link_row" shrink v-for="(album, index) in albums" :key="album.name" @mouseenter="mouseEnterLink(index)" @mouseleave="mouseExitLink(index)" v-show="adminMode || !album.hidden")
             span.link-box(@mouseenter="openAndTop(index)")
               router-link(class="link" :to="'album_'+album.name")
-                a(:style="{'text-decoration': album.hidden ? 'line-through' : 'none', 'overflow-x': adminMode ? 'hidden' : ''}"  ) {{ album.name }}
+                a.ignore-theme(:style="{'text-decoration': album.hidden ? 'line-through' : 'none', 'overflow-x': adminMode ? 'hidden' : ''}"  ) {{ album.name }}
             transition(name="fade")
               span(v-if="adminMode" v-show="album.mouseOverLink")
                 button(@click="openEditor(index)" @mouseenter="openAndTop(index)")
@@ -23,15 +23,88 @@
           //- transition(name="fade" v-if="adminMode")
           span.overlay.cover(v-show="hoveredIndex === index")
             .overlay.disable-select(style="height: 50%; width: 50%" @click="openEditor(index)")
-              v-icon.overlay_item.centered.material-icons-outlined() edit
+              v-icon.overlay_item.centered.material-icons-outlined(small) edit
             .overlay.disable-select(style="height: 50%; width: 50%; transform: translate(100%, 0)" @click="swapVisible(index); updateVisibility(index)")
-              v-icon.overlay_item.centered.material-icons-outlined {{ !albums[index].hidden ? 'visibility' : 'visibility_off' }}
+              v-icon.overlay_item.centered.material-icons-outlined(small) {{ !albums[index].hidden ? 'visibility' : 'visibility_off' }}
             router-link.overlay.disable-select(:to="'album_'+album.name" style="height: 50%; transform: translate(0, 100%)")
-              v-icon.overlay_item.centered.material-icons-outlined() arrow_forward
+              v-icon.overlay_item.centered.material-icons-outlined(small) arrow_forward
           img(:src="assetsPath + album.photos[album.coverIndex].path" )
         router-link(:to="'album_'+album.name" v-else)
             img(:src="assetsPath + album.photos[album.coverIndex].path" )
 </template>
+<style lang="scss">
+.photo_container {
+    width: 100%;
+    max-width: 100%;
+    transition: 0.5s;
+    column-gap: 0px;
+    line-height: 0px;
+    columns: 3;
+    img {
+        transition: 1s;
+        padding: 3px;
+        width: 100%;
+    }
+}
+
+.photo_container_stack {
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    margin-top: 20px;
+    // top: 50%;
+    img {
+        position: absolute;
+        // transform: translateY(-50%);
+        min-height: 128px;
+        height: 80%;
+        max-height: 512px;
+    }
+}
+
+.nav_side {
+    padding-top: 10%;
+    display: inline;
+    transition: 0.5s;
+
+    .link_row,
+    .eva-hover {
+        text-align: start !important;
+    }
+
+    .link-box {
+        &:hover {
+            a {
+                padding-left: 10px;
+                color: lightgrey;
+            }
+        }
+    }
+    a {
+        color: grey;
+    }
+    .link_row {
+        justify-content: space-between;
+        flex-direction: row;
+        display: flex;
+        width: 150px;
+        height: 30px;
+        transition: 0.35s;
+    }
+
+    .closebtn {
+        position: absolute;
+        top: 0;
+        right: 25px;
+        font-size: 36px;
+        margin-left: 50px;
+    }
+}
+.home {
+    height: 100%;
+    max-height: 100%;
+}
+</style>
 
 <script>
 // @ is an alias to /src
@@ -73,16 +146,12 @@ export default {
         this.position();
     },
     methods: {
-        onScroll(e) {
-            // this.offset = e.target.scrollingElement.scrollTop;
-        },
         openEditor(index) {
             // this.edit = true;
             this.model = JSON.parse(JSON.stringify(this.albums[index]));
             this.$dialog.show(Album, {
-                propsData: {
-                    was: JSON.parse(JSON.stringify(this.albums[index]))
-                }
+                was: JSON.parse(JSON.stringify(this.albums[index])),
+                title: 'Edit album'
             });
         },
         updateVisibility(index) {
@@ -184,76 +253,3 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.photo_container {
-    width: 100%;
-    max-width: 100%;
-    transition: 0.5s;
-    column-gap: 0px;
-    line-height: 0px;
-    columns: 3;
-    img {
-        transition: 1s;
-        padding: 3px;
-        width: 100%;
-    }
-}
-
-.photo_container_stack {
-    height: 100%;
-    width: 100%;
-    position: fixed;
-    margin-top: 20px;
-    // top: 50%;
-    img {
-        position: absolute;
-        // transform: translateY(-50%);
-        min-height: 128px;
-        height: 80%;
-        max-height: 512px;
-    }
-}
-
-.nav_side {
-    padding-top: 10%;
-    display: inline;
-    transition: 0.5s;
-
-    .link_row,
-    .eva-hover {
-        text-align: start !important;
-    }
-
-    .link-box {
-        &:hover {
-            a {
-                padding-left: 10px;
-                color: lightgrey;
-            }
-        }
-    }
-    a {
-        color: grey;
-    }
-    .link_row {
-        justify-content: space-between;
-        flex-direction: row;
-        display: flex;
-        width: 150px;
-        height: 30px;
-        transition: 0.35s;
-    }
-
-    .closebtn {
-        position: absolute;
-        top: 0;
-        right: 25px;
-        font-size: 36px;
-        margin-left: 50px;
-    }
-}
-.home {
-    height: 100%;
-    max-height: 100%;
-}
-</style>

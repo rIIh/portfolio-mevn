@@ -4,6 +4,10 @@
           voption(:opened="edit" type="image" property="home_background" @done="getBG" @busy="uploading = true" @unbusy="uploading = false") 
       r-btn.home-button(v-if="adminMode" @click="edit = !edit") Change background image
 </template>
+<style lang="sass">
+.home-button
+  transform: translate(0, -80px)
+</style>
 
 <script>
 const api = require("../api/settings_api");
@@ -68,7 +72,3 @@ export default {
 };
 </script>
 
-<style lang="sass">
-.home-button
-  transform: translate(0, -80px)
-</style>

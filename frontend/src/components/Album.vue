@@ -5,8 +5,7 @@
         .v-card__title
           .container.pb-0.grid-list-md
             .layout.justify-start
-              span.headline
-                slot
+              span.headline {{title}}
         .v-card__text
           .container.grid-list-md.pt-0
             .layout.column.justify-center
@@ -34,6 +33,80 @@
                 input(type="file" style="display: none" ref="photo_picker" multiple accept="image/*" @change="onPhotosPicked")
 </template>
 
+<style lang="scss">
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active до версии 2.1.8 */ {
+    opacity: 0;
+}
+
+/*Wrapper*/
+.my-scrollbar {
+    // width: 35%;
+    // min-width: 300px;
+
+    max-height: 90vh;
+    color: aqua;
+}
+.photos {
+    line-height: 0;
+    .photo{
+        position: relative;
+    }
+}
+
+.upload_image {
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.remove_btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    // background-color: #ff6b51;
+    background-color: black;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    transition: 0.5s ease;
+    z-index: 0;
+
+    &.cover {
+        background-color: rgba(255, 255, 255, 0.637);
+    }
+    &.remove {
+        background-color: rgba(255, 51, 0, 0.479);
+    }
+    .overlay_item {
+        z-index: 100;
+        &.centered {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+    }
+}
+</style>
+
+
 <script>
 import VueScrollbar from "vue2-scrollbar";
 const C = require("../api/consts");
@@ -55,10 +128,17 @@ export default {
             busyProgress: 0,
         };
     },
+    props: {
+        was: Object,
+        title: String,
+    },
     watch: {
         was: function(newVal, oldVal) {
             this.model = JSON.parse(JSON.stringify(newVal));
         }
+    },
+    mounted(){
+        this.model = JSON.parse(JSON.stringify(this.was));
     },
     computed: {
         valid() {
@@ -71,13 +151,7 @@ export default {
         editing() {
             return this.was !== undefined;
         },
-        was(){
-            if(this.$attrs.propsData)
-            return this.$attrs.propsData.was;
-        }
     },
-
-    mounted() {},
     methods: {
         busy(value) {
             this.busyVal = value;
@@ -207,75 +281,3 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.5s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active до версии 2.1.8 */ {
-    opacity: 0;
-}
-
-/*Wrapper*/
-.my-scrollbar {
-    // width: 35%;
-    // min-width: 300px;
-
-    max-height: 90vh;
-    color: aqua;
-}
-.photos {
-    line-height: 0;
-    .photo{
-        position: relative;
-    }
-}
-
-.upload_image {
-    img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-}
-
-.remove_btn {
-    position: absolute;
-    top: 0;
-    right: 0;
-
-    // background-color: #ff6b51;
-    background-color: black;
-}
-
-.overlay {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 100%;
-    width: 100%;
-    transition: 0.5s ease;
-    z-index: 0;
-
-    &.cover {
-        background-color: rgba(255, 255, 255, 0.637);
-    }
-    &.remove {
-        background-color: rgba(255, 51, 0, 0.479);
-    }
-    .overlay_item {
-        z-index: 100;
-        &.centered {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            -webkit-transform: translate(-50%, -50%);
-            -ms-transform: translate(-50%, -50%);
-            transform: translate(-50%, -50%);
-            text-align: center;
-        }
-    }
-}
-</style>

@@ -5,3 +5,4 @@ resources
 .env*
 *.log
 .env.production
+public

@@ -12,41 +12,51 @@
             v-icon.material-icons-outlined attachment
           v-list-tile-content 
             v-list-tile-title post album
+        v-list-tile(@click="openPageEditor(); tools = false")
+          v-list-tile-action
+            v-icon.material-icons-outlined color_lens
+          v-list-tile-content 
+            v-list-tile-title theme
         v-list-tile(@click="logout")
           v-list-tile-action
             v-icon.material-icons-outlined exit_to_app
           v-list-tile-content 
             v-list-tile-title log out
 
-    v-layout(justify-space-between align-baseline shrink style="padding: 24px; padding-bottom: 0")
-      v-flex(shrink)
-        v-icon.pr-3(@click.stop="tools = !tools" v-if="breakpoint.smAndDown && isAuth") menu
-        router-link(:to="link()" class="main link")
-          h1.brand(:class="$store.getters.theme" :style="breakpoint.smAndDown ? 'font-size: 24px' : ''") Yura&#160;Taralov
-        template(v-if="isAuth && breakpoint.mdAndUp")
-          span.no-wrap.px-3
-            //- button.darkify.custom-btn.px-3(:class="adminMode ? 'pressed' : 'depressed'" @click="adminChange") admin mode
-            r-btn.px-3(:pressed="adminMode" @click="adminChange") admin mode
-            r-btn.px-3(@click="openEditor") post album
-            r-btn.px-3(@click="logout") log out
-            r-btn.pa-0()
-              v-icon.material-icons-outlined(small @click="") settings
-      v-flex(shrink)
-        router-link.link.about(to="/about" :class="$store.getters.theme") Contacts
-    v-content
-      v-container(fluid fill-height)
-        v-flex(fill-height)
-          router-view.view(@block-height="heightBlocked = true" @unblock-height="heightBlocked = false")
+    theme.fill-height(:view-id="$route.name")
+      .layout.column.fill-height
+        .flex.shrink
+          v-layout(justify-space-between align-baseline shrink style="padding: 24px; padding-bottom: 0")
+            v-flex(shrink)
+              v-icon.pr-3(@click.stop="tools = !tools" v-if="breakpoint.smAndDown && isAuth") menu
+              router-link(:to="link()" class="main link")
+                h1.brand(:class="$store.getters.theme" :style="breakpoint.smAndDown ? 'font-size: 24px' : ''") Yura&#160;Taralov
+              template(v-if="isAuth && breakpoint.mdAndUp")
+                span.no-wrap.px-3
+                  r-btn.px-3(:pressed="adminMode" @click="adminChange") admin mode
+                  r-btn.px-3(@click="openEditor") post album
+                  r-btn.px-3(@click="logout") log out
+                  r-btn.pa-0(@click="openPageEditor")
+                    v-icon.material-icons-outlined(small @click="") color_lens
+            v-flex(shrink)
+              router-link.link.about(to="/about" :class="$store.getters.theme") Contacts
+        .flex.grow
+          v-container(fluid fill-height)
+            v-flex(fill-height)
+              router-view.view(@block-height="heightBlocked = true" @unblock-height="heightBlocked = false")
           
 </template>
 
 <script>
 import Navigation from "@/components/Navigation.vue";
 import Album from "@/components/Album.vue";
+import Theme from '@/components/Theme.vue';
 import Axios from "axios";
+import Options from '@/components/Options.vue';
 import { Bus } from "./event-bus";
 
 const C = require("./api/consts");
+const StyleTemplate = require('./api/style').default;
 
 export default {
     data() {
@@ -65,11 +75,20 @@ export default {
         },
         breakpoint() {
             return this.$vuetify.breakpoint;
-        }
+        },
     },
     methods: {
         openEditor() {
-            this.$dialog.show(Album);
+            this.$dialog.show(Album, {
+              title: 'Create new album'
+            });
+        },
+        openPageEditor(){
+          this.$dialog.show(Options, {
+            id: this.$route.name,
+            fields: StyleTemplate,
+            title: 'Toggle dark theme'
+          });
         },
         link() {
             let target =
@@ -120,7 +139,8 @@ export default {
     },
     components: {
         Navigation,
-        Album
+        Album,
+        Theme,Options
     }
 };
 </script>

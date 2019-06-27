@@ -11,7 +11,25 @@
           .main-text Already authenticated
           r-btn( @click="logout") Log out
 </template>
-
+<style lang="scss">
+.form-container {
+  // height: 200px;
+  // width: 200px;
+  input {
+    display: block !important;
+    border: 1px solid black;
+    margin: 8px;
+    padding: 4px;
+  }
+  * {
+    width: 100%;
+    height: 32px;
+  }
+  &:focus {
+    outline: 0;
+  }
+}
+</style>
 
 <script>
 const C = require("../api/consts");
@@ -44,22 +62,4 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.form-container {
-  // height: 200px;
-  // width: 200px;
-  input {
-    display: block !important;
-    border: 1px solid black;
-    margin: 8px;
-    padding: 4px;
-  }
-  * {
-    width: 100%;
-    height: 32px;
-  }
-  &:focus {
-    outline: 0;
-  }
-}
-</style>
+

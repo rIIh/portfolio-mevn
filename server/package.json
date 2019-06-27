@@ -2,12 +2,12 @@
   "name": "yurta",
   "version": "0.0.1",
   "description": "Portfolio sire using Express, Vue and Mongo",
-  "main": "server/main.js",
+  "main": "main.js",
   "scripts": {
     "front:build": "npm run --prefix frontend build",
     "front:watch": "npm run --prefix frontend build --watch",
-    "start": "NODE_ENV=production node server/main.js",
-    "dev": "NODE_ENV=development nodemon --ignore './frontend/' server/main.js",
+    "start": "NODE_ENV=production node main.js",
+    "dev": "NODE_ENV=development PORT=6600 nodemon --ignore './frontend/' main.js",
     "dev:watch": "npm run dev & npm run front:watch"
   },
   "keywords": [

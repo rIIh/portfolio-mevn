@@ -22,6 +22,12 @@
 
             
 </template>
+<style lang="scss">
+.opt_img {
+  max-height: 350px;
+  max-width: 100%;
+}
+</style>
 
 <script>
 const C = require("../api/consts");
@@ -133,9 +139,3 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.opt_img {
-  max-height: 350px;
-  max-width: 100%;
-}
-</style>

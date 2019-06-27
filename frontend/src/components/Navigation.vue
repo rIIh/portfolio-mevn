@@ -7,17 +7,6 @@
     router-link(to="/gallery" key="gallery" v-if="currentRoute != 'home'") Gallery
     router-link(to="/about"  key="contacts") Contacts  
 </template>
-
-<script>
-export default {
-  computed: {
-    currentRoute() {
-      return this.$route.name;
-    }
-  }
-};
-</script>
-
 <style lang="scss">
 .space {
   padding: 32px;
@@ -60,3 +49,14 @@ export default {
   }
 }
 </style>
+
+<script>
+export default {
+  computed: {
+    currentRoute() {
+      return this.$route.name;
+    }
+  }
+};
+</script>
+
