@@ -1,8 +1,6 @@
 node_modules
 package-lock.json
-front_tmp
 resources
 .env*
 *.log
 .env.production
-public

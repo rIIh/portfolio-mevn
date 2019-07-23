@@ -3,9 +3,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 module.exports = {
-    createRoot: function (rootPassword) {
+    createRoot: function (rootName, rootPassword) {
         models.UserDAO.findOne({
-            username: 'root'
+            username: rootName
         }, (err, res) => {
             if (err) {
                 console.log(err);
@@ -13,12 +13,12 @@ module.exports = {
             }
             if (res === null) {
                 models.UserDAO.create({
-                    username: 'root',
+                    username: rootName,
                     password: rootPassword
                 });
             } else {
                 models.UserDAO.update({
-                    username: 'root'
+                    username: rootName
                 }, {
                     password: rootPassword
                 })
@@ -71,7 +71,7 @@ module.exports = {
                     const token = jwt.sign({
                         id: userInfo._id
                     }, req.app.get('secretKey'), {
-                        expiresIn: '725h'
+                        expiresIn: '9999h'
                     });
                     res.json({
                         status: "success",
