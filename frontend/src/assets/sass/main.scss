@@ -6,9 +6,21 @@
     }
 }
 
+.dev-box {
+    position: absolute;
+    right: -50px;
+    top: -10px;
+    width: 100px;
+    height: 20px;
+    transform: rotate(45deg) translate(0%, 150%);
+    background: #b32121;
 
+    p {
+        color: white
+    }
+}
 
-.relative{
+.relative {
     position: relative;
 }
 
@@ -108,79 +120,92 @@ a.link {
     padding: 0.5ex 2em;
     vertical-align: super !important;
     transition: 0.2s;
-  
+
     .progress {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 50%;
-      transform: translate(-50%, -50%);
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 50%;
+        transform: translate(-50%, -50%);
     }
-  
+
     &.theme--dark {
-      border: 1px solid white;
-      color: white;
-      * {
-        color: white !important;
-      }
-  
-      &.pressed,
-      &:hover:enabled {
         border: 1px solid white;
-        background: white;
-        color: black !important;
+        color: white;
+
         * {
-          color: black !important;
+            color: white !important;
         }
-      }
-      &.disabled {
-        color: lightgrey;
-        border: 1px solid lightgrey;
-        * {
-          color: lightgrey;
+
+        &.pressed,
+        &:hover:enabled {
+            border: 1px solid white;
+            background: white;
+            color: black !important;
+
+            * {
+                color: black !important;
+            }
         }
-      }
-      &:hover.disabled {
-        border: 1px solid lightgrey;
-        background: lightgrey;
-        color: lightgrey;
-        * {
-          color: lightgrey;
+
+        &.disabled {
+            color: lightgrey;
+            border: 1px solid lightgrey;
+
+            * {
+                color: lightgrey;
+            }
         }
-      }
-      &:focus {
-        outline: 0;
-      }
+
+        &:hover.disabled {
+            border: 1px solid lightgrey;
+            background: lightgrey;
+            color: lightgrey;
+
+            * {
+                color: lightgrey;
+            }
+        }
+
+        &:focus {
+            outline: 0;
+        }
     }
-  
+
     &.pressed,
     &:hover {
-      border: 1px solid black;
-      background: black;
-      color: white;
-      * {
+        border: 1px solid black;
+        background: black;
         color: white;
-      }
+
+        * {
+            color: white;
+        }
     }
+
     &.disabled {
-      color: grey;
-      border: 1px solid grey;
-      * {
         color: grey;
-      }
+        border: 1px solid grey;
+
+        * {
+            color: grey;
+        }
     }
+
     &:hover.disabled {
-      background: lightgrey;
-      cursor: default;
+        background: lightgrey;
+        cursor: default;
     }
+
     &:focus {
-      outline: 0;
+        outline: 0;
     }
 }
 
 .button_theme_dark .custom-btn {
     border: 1px solid white;
     color: white !important;
+
     * {
         color: white;
     }
@@ -190,6 +215,7 @@ a.link {
         border: 1px solid white;
         background: white;
         color: black;
+
         * {
             color: black;
         }
@@ -227,14 +253,19 @@ a.link {
         color: white;
     }
 }
+
 .text_theme_dark {
-    .brand, .h1, a {
-        &:not(.ignore-theme){
+
+    .brand,
+    .h1,
+    a {
+        &:not(.ignore-theme) {
             color: white
         }
     }
 }
-p{
+
+p {
     margin: 0px;
 }
 
@@ -243,7 +274,7 @@ p{
 }
 
 .v-icon {
-    transform: translate(0.5px,0.5px)
+    transform: translate(0.5px, 0.5px)
 }
 
 .force-overflow {
@@ -269,11 +300,11 @@ p{
     // overflow: hidden;
 }
 
-.about-content{
+.about-content {
     text-align: initial;
 }
 
-html{
+html {
     overflow: hidden;
 }
 

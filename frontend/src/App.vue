@@ -1,5 +1,7 @@
 <template lang="pug">
   v-app#app()
+    .dev-box(v-if="process.env.DEV")
+      p DEV
     v-navigation-drawer(absolute v-model="tools" v-if="breakpoint.smAndDown && isAuth")
       v-list
         v-list-tile(@click="adminChange")
