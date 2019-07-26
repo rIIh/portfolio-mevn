@@ -22,6 +22,7 @@
                         v-icon(dark) clear
                       img(:src="(editing && !photo.file) ? assetsPath + photo.path : photo.path" :key="index" width="100%")
                 v-alert(type="error" outline :value="model.photos[0] === undefined") At least one photo is required
+                
                 .layout.justify-space-between.fluid
                   .flex.shrink(v-if="was")
                     r-btn.ma-0(ignoreTheme @click="remove") Remove

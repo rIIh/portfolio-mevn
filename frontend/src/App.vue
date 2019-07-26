@@ -44,19 +44,18 @@
           v-container(fluid fill-height)
             v-flex(fill-height)
               router-view.view(@block-height="heightBlocked = true" @unblock-height="heightBlocked = false")
-          
 </template>
 
 <script>
 import Navigation from "@/components/Navigation.vue";
 import Album from "@/components/Album.vue";
-import Theme from '@/components/Theme.vue';
+import Theme from "@/components/Theme.vue";
 import Axios from "axios";
-import Options from '@/components/Options.vue';
+import Options from "@/components/Options.vue";
 import { Bus } from "./event-bus";
 
 const C = require("./api/consts");
-const StyleTemplate = require('./api/style').default;
+const StyleTemplate = require("./api/style").default;
 
 export default {
     data() {
@@ -75,20 +74,20 @@ export default {
         },
         breakpoint() {
             return this.$vuetify.breakpoint;
-        },
+        }
     },
     methods: {
         openEditor() {
             this.$dialog.show(Album, {
-              title: 'Create new album'
+                title: "Create new album"
             });
         },
-        openPageEditor(){
-          this.$dialog.show(Options, {
-            id: this.$route.name,
-            fields: StyleTemplate,
-            title: 'Toggle dark theme'
-          });
+        openPageEditor() {
+            this.$dialog.show(Options, {
+                id: this.$route.name,
+                fields: StyleTemplate,
+                title: "Toggle dark theme"
+            });
         },
         link() {
             let target =
@@ -140,7 +139,8 @@ export default {
     components: {
         Navigation,
         Album,
-        Theme,Options
+        Theme,
+        Options
     }
 };
 </script>

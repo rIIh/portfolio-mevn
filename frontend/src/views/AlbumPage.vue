@@ -1,5 +1,6 @@
 <template lang="pug">
   .layout.fill-height.column.justify-space-around.align-content-space-between( v-if="album")
+    .spacer
     .flex(style="flex-grow: 4 !important")
       .card.flat(@click="$router.go(-1)" style="height: 100%; position: relative; overflow-y: hidden;")
         transition(name="long-fade")
@@ -12,11 +13,12 @@
     .spacer
 </template>
 <style lang="scss">
-.long-fade-enter-active, .long-fade-leave-active {
-  transition: opacity 2s;
+.long-fade-enter-active,
+.long-fade-leave-active {
+    transition: opacity 2s;
 }
 .long-fade-enter, .long-fade-leave-to /* .fade-leave-active до версии 2.1.8 */ {
-  opacity: 0;
+    opacity: 0;
 }
 .page {
     transition: color 1s;

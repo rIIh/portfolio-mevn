@@ -1,9 +1,5 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Gallery from "./views/Gallery";
-import Login from "./views/Login";
-import Album from "./views/AlbumPage";
-
 
 import store from "./store";
 const C = require("./api/consts");
@@ -13,8 +9,7 @@ Vue.use(Router);
 const router = new Router({
   mode: "history",
   base: process.env.BASE_URL,
-  routes: [
-    {
+  routes: [{
       path: "/",
       name: "home",
       component: () => import('./views/Home.vue')
