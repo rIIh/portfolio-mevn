@@ -4,8 +4,9 @@
     .flex(style="flex-grow: 4 !important")
       .card.flat(@click="$router.go(-1)" style="height: 100%; position: relative; overflow-y: hidden;")
         transition(name="long-fade")
-          img.photo(style="position: absolute; max-width: 100%; max-height: 100%; top: 50%; transform: translate(-50%, -50%)" :src="assetsPath + album.photos[currentIndex].path" :key="currentIndex" alt="photo" @click.stop="increment(); skip=true")
-          //- img.photo(:style="orientation" style="position: absolute; top: 50%; transform: translate(-50%, -50%)" :src="assetsPath + album.photos[currentIndex].path" :key="currentIndex" alt="photo" @click.stop="increment(); skip=true")
+          img.photo.slide(v-for="(photo, index) in album.photos" :src="assetsPath + photo.path" v-show="index === currentIndex" :key="index" alt="photo" @click.stop="increment")
+          //img.photo.slide(:src="assetsPath + album.photos[currentIndex].path" :key="currentIndex" alt="photo" @click.stop="increment")
+          //img.photo(:style="orientation" style="position: absolute; top: 50%; transform: translate(-50%, -50%)" :src="assetsPath + album.photos[currentIndex].path" :key="currentIndex" alt="photo" @click.stop="increment(); skip=true")
     .flex.shrink
       .pages.ma-3
         template(v-for="n in album.photos.length")
@@ -13,13 +14,23 @@
     .spacer
 </template>
 <style lang="scss">
+.slide{
+    position: absolute;
+    max-width: 100%;
+    max-height: 100%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
 .long-fade-enter-active,
 .long-fade-leave-active {
     transition: opacity 2s;
 }
+
 .long-fade-enter, .long-fade-leave-to /* .fade-leave-active до версии 2.1.8 */ {
     opacity: 0;
 }
+
 .page {
     transition: color 1s;
     color: black;

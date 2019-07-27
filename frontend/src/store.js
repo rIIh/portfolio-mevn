@@ -16,6 +16,7 @@ export default new Vuex.Store({
     app: {
       adminMode: localStorage.getItem("admin-mode") === "true" ? true : false,
       theme: "theme--light",
+      dev: process.env.NODE_ENV === 'development',
       window: {
         screen: {}
       }
@@ -23,6 +24,7 @@ export default new Vuex.Store({
   },
   getters: {
     isAuthenticated: state => !!state.user.token,
+    isDev: state => !!state.app.dev,
     isSuper: (state, getters) => state.app.adminMode && getters.isAuthenticated,
     theme: state => state.app.theme,
     authStatus: state => state.user.status,

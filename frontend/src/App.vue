@@ -75,6 +75,9 @@ export default {
         isAuth() {
             return this.$store.getters.isAuthenticated;
         },
+        isDev(){
+          return this.$store.getters.isDev;
+        },
         breakpoint() {
             return this.$vuetify.breakpoint;
         }
