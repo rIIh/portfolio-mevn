@@ -6,7 +6,7 @@
         quill-editor(ref="myTextEditor" v-model="content" :options="editorOption")
         // r-async-editor()
                       
-    span.about-content(v-html="content")
+    span.about-content.fill-height(v-html="content")
 </template>
 <style lang="sass">
 .ql-save
