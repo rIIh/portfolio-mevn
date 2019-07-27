@@ -97,7 +97,7 @@ export default {
     beforeMount() {
         this.$emit("block-height");
     },
-    mounted() {
+    created() {
         this.id = this.$route.params.id;
         this.loadAlbum().then();
     }

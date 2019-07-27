@@ -130,7 +130,7 @@ export default {
         $("body").css("background-image", this.initial);
         next();
     },
-    mounted() {
+    created() {
         this.initial = $("body").css("background-image");
         this.loadContent();
         this.getBG();

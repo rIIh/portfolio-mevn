@@ -64,7 +64,7 @@ export default {
     this.applyStyles(true);
     next();
   },
-  mounted() {
+  created() {
     this.initial = $("body").css("background-image");
     this.getBG();
   },

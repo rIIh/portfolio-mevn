@@ -45,7 +45,8 @@
         .flex.grow
           v-container(fluid fill-height)
             v-flex(fill-height)
-              router-view.view(@block-height="heightBlocked = true" @unblock-height="heightBlocked = false")
+              keep-alive
+                router-view.view(:key="$route.fullPath" @block-height="heightBlocked = true" @unblock-height="heightBlocked = false")
 </template>
 
 <script>

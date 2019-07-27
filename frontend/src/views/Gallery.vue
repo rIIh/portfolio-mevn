@@ -233,7 +233,7 @@ export default {
             this.$set(this.albums, i, alb);
         }
     },
-    mounted() {
+    created() {
         this.getAlbums();
         Bus.$on("window-resize", this.handleResize);
         Bus.$on("album-db-changed", this.getAlbums);
