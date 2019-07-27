@@ -1,7 +1,7 @@
 <template lang="pug">
   v-app#app()
     .dev-box(v-if="true")
-      p DEV
+      p.unselectable DEV
     v-navigation-drawer(absolute v-model="tools" v-if="breakpoint.smAndDown && isAuth")
       v-list
         v-list-tile(@click="adminChange")
@@ -32,7 +32,7 @@
             v-flex(shrink)
               v-icon.pr-3(@click.stop="tools = !tools" v-if="breakpoint.smAndDown && isAuth") menu
               router-link(:to="link()" class="main link")
-                h1.brand(:class="$store.getters.theme" :style="breakpoint.smAndDown ? 'font-size: 24px' : ''") Yura&#160;Taralov
+                h1.brand.unselectable(:class="$store.getters.theme" :style="breakpoint.smAndDown ? 'font-size: 24px' : ''") Yura&#160;Taralov
               template(v-if="isAuth && breakpoint.mdAndUp")
                 span.no-wrap.px-3
                   r-btn.px-3(:pressed="adminMode" @click="adminChange") admin mode
@@ -41,7 +41,7 @@
                   r-btn.pa-0(@click="openPageEditor")
                     v-icon.material-icons-outlined(small @click="") color_lens
             v-flex(shrink)
-              router-link.link.about(to="/about" :class="$store.getters.theme") Contacts
+              router-link.link.about.unselectable(to="/about" :class="$store.getters.theme") Contacts
         .flex.grow
           v-container(fluid fill-height)
             v-flex(fill-height)
