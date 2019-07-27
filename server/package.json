@@ -6,7 +6,7 @@
   "scripts": {
     "front:build": "npm run --prefix ../frontend build",
     "front:watch": "npm run --prefix ../frontend build --watch",
-    "start": "npm run front:build & NODE_ENV=production node main.js",
+    "start": "npm run front:build ; NODE_ENV=production node main.js",
     "dev": "NODE_ENV=development nodemon --ignore '../frontend/' main.js",
     "dev:watch": "npm run dev & npm run front:watch"
   },
