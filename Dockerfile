@@ -4,16 +4,13 @@ RUN apk add --no-cache make gcc g++ python
 WORKDIR /application
 COPY /server/package*.json ./server/
 COPY /frontend/package*.json ./frontend/
-RUN ls
 
-WORKDIR ./server
-RUN npm install
-WORKDIR ../frontend
+WORKDIR /application/frontend
 RUN npm install
 
-WORKDIR ..
+WORKDIR /application
 COPY . .
-RUN ls
 
-WORKDIR ./server
+WORKDIR /application/server
+RUN npm install
 CMD [ "npm", "start" ]
