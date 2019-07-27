@@ -1,11 +1,10 @@
 <template lang="pug">
-  .layout.fill-height.column.justify-space-around.align-content-space-between( v-if="album")
+  .layout.fill-height.column.justify-space-around.align-content-space-between(v-if="album")
     .spacer
     .flex(style="flex-grow: 4 !important")
       .card.flat(@click="$router.go(-1)" style="height: 100%; position: relative; overflow-y: hidden;")
-        transition(name="long-fade")
-          img.photo.slide(v-for="(photo, index) in album.photos" :src="assetsPath + photo.path" :key="index" alt="photo" @click.stop="increment")
-          //img.photo.slide(v-for="(photo, index) in album.photos" :src="assetsPath + photo.path" v-show="index === currentIndex" :key="index" alt="photo" @click.stop="increment")
+        transition-group(name="long-fade")
+          img.photo.slide(v-for="(photo, index) in album.photos" :src="assetsPath + photo.path" v-show="index === currentIndex" :key="index" alt="photo" @click.stop="increment")
           //img.photo.slide(:src="assetsPath + album.photos[currentIndex].path" :key="currentIndex" alt="photo" @click.stop="increment")
           //img.photo(:style="orientation" style="position: absolute; top: 50%; transform: translate(-50%, -50%)" :src="assetsPath + album.photos[currentIndex].path" :key="currentIndex" alt="photo" @click.stop="increment(); skip=true")
     .flex.shrink
