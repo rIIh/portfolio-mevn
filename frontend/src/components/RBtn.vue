@@ -1,5 +1,5 @@
 <template lang="pug">
-    button.custom-btn(:class="(pressed ? 'pressed ' : ' ') + (ignoreTheme ? '' : theme + ' ') + (disabled ? 'disabled' : ' ')" @click="$emit('click')")
+    button.custom-btn(:type="type === undefined ? 'button' : type" :class="(pressed ? 'pressed ' : ' ') + (ignoreTheme ? '' : theme + ' ') + (disabled ? 'disabled' : ' ')" @click="$emit('click')")
         span(:class="loading ? 'invisible' : ''")
             slot(v-show="!loading")
         v-progress-linear.progress.ma-0(v-if="loading" :indeterminate="!!progress" color="black" :value="progress")
@@ -31,6 +31,7 @@ export default {
     progress: Number,
     pressed: Boolean,
     disabled: Boolean,
+    type: String,
     classes: ""
   }
 };

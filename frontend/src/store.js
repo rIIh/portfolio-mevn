@@ -4,6 +4,12 @@ import Vuex from "vuex";
 Vue.use(Vuex);
 
 import Axios from "axios";
+Axios.interceptors.response.use(function (response) {
+  return response;
+}, function (error) {
+  // Do something with response error
+  return Promise.resolve(error.response);
+});
 
 const C = require("./api/consts");
 

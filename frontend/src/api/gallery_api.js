@@ -43,15 +43,22 @@ export async function uploadAlbum(album, onprogress, explode) {
     album.photos.forEach((e, i) => {
         form.append("files[" + i + "]", e.file);
     });
-    const response = await axios.post("api/albums/", form, {
-        headers: {
-            "Content-Type": "multipart/form-data"
-        },
-        onUploadProgress: data => {
-            let percent = Math.floor(data.loaded / data.total);
-            onprogress(percent);
-        }
-    });
+    var response;
+    try {
+        response = await axios.post("api/albums/", form, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            },
+            onUploadProgress: data => {
+                let percent = Math.floor(data.loaded / data.total);
+                onprogress(percent);
+            }
+        });
+    }
+    catch(error) {
+        console.log(error)
+        response = error;
+    }
     return response;
 }
 

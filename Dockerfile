@@ -9,6 +9,7 @@ WORKDIR /application/frontend
 RUN npm install
 
 WORKDIR /application
+ADD CHECKS /app
 COPY . .
 
 WORKDIR /application/server

@@ -31,6 +31,8 @@ const PhotoSchema = new Schema({
     hash: String,
 })
 
+// TODO: Create pre delete hooks
+
 const PhotoDAO = mongoose.model('photo', PhotoSchema);
 
 const AlbumDAO = mongoose.model('album', new Schema({

@@ -23,6 +23,13 @@ Vue.use(VuetifyDialog, {
   context: context
 });
 
+// Import component
+import Loading from 'vue-loading-overlay';
+// Import stylesheet
+import 'vue-loading-overlay/dist/vue-loading.css';
+// Init plugin
+Vue.use(Loading);
+
 // import Quill from 'quill';
 // var SizeStyle = Quill.import('attributors/style/size');
 // Quill.register(SizeStyle, true);

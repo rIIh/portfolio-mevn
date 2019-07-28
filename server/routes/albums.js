@@ -34,28 +34,21 @@ function parseAlbum(req, next) {
     form.hash = 'md5';
     form.parse(req)
         .on('file', (name, file) => {
-            console.log(file)
             album.photos.push({
                 path: file.path.substring(file.path.indexOf('photos')),
                 hash: file.hash,
             })
         })
         .on('field', (name, field) => {
-            // if (name === 'photos') {
-            //     Array.from(field).forEach(photo => {
-            //         album[name].push(photo)
-            //     });
-            // } else
             album[name] = field
         })
         .on('end', () => {
-            console.log(album);
             album.hidden = false;
             next(album);
         })
 }
 
-function parsePhotos(req, next) {
+function parsePhotos(req, res, next) {
     let form = new formidable.IncomingForm();
     let photos = [];
 
@@ -73,17 +66,18 @@ function parsePhotos(req, next) {
                     hash: file.hash,
                 })
             })
-            .on('field', (name, field) => {})
-            .on('aborted', () => console.log('aborted', form))
-            .on('error', (err) => console.log(err))
+            .on('aborted', () => res.status(409).send('Connection aborted'))
+            .on('error', (err) => res.status(500).send('Something goes wrong'))
             .on('end', () => {
                 next(photos);
             })
     } catch (e) {
+        res.status(500).send("Something goes wrong")
         console.log(e)
     }
 }
 
+//FIX: Check if photo deleted.
 router.put('/', function (req, res, next) {
     if (!req.connection.authenticated) res.status(401).send();
     let queue = []
@@ -97,7 +91,7 @@ router.put('/', function (req, res, next) {
             }
         })
     });
-    DAO.AlbumDAO.bulkWrite(queue).then(res => console.log(res.insertedCount, res.modifiedCount, res.deletedCount))
+    DAO.AlbumDAO.bulkWrite(queue).then(res => console.log('Album updated', res.insertedCount, res.modifiedCount, res.deletedCount))
     res.json(queue)
 })
 
@@ -106,7 +100,7 @@ router.delete('/:name', function (req, res, next) {
     DAO.AlbumDAO.deleteOne({
         name: req.params.name
     }, console.log)
-    res.send('done')
+    res.send('Everything is OK')
 })
 
 router.post('/', (req, res) => {
@@ -117,10 +111,10 @@ router.post('/', (req, res) => {
         }, (err, result) => {
             if (err) throw (err)
             if (result !== null) {
-                res.status(400).send('already exists')
+                res.status(400).send('Album with that name already exists')
             } else {
                 DAO.AlbumDAO.create(album);
-                res.send('done')
+                res.send('Everything is OK')
             }
         })
     })
@@ -128,8 +122,8 @@ router.post('/', (req, res) => {
 
 router.post('/:id/photos_post', (req, res) => {
     if (!req.connection.authenticated) res.status(401).send();
-    if (req.params.id === undefined) res.status(404).send('nothing')
-    parsePhotos(req, photos => {
+    if (req.params.id === undefined) res.status(404).send('Album not found')
+    parsePhotos(req, res, photos => {
 
         DAO.AlbumDAO.findOne({
             _id: req.params.id
@@ -137,17 +131,14 @@ router.post('/:id/photos_post', (req, res) => {
             if (err) throw err;
             if (result) {
                 Array.prototype.push.apply(result.photos, photos);
-                console.log(result.photos, photos)
                 DAO.AlbumDAO.updateOne({
                     _id: req.params.id
                 }, {
                     photos: result.photos
                 }, (err, result) => {
-                    console.log(err, result)
-
-                    res.send('done')
+                    res.send('Everything is OK')
                 });
-            } else res.status(500).send('failed')
+            } else res.status(500).send('Something goes wrong')
         })
     })
 })
@@ -157,7 +148,7 @@ router.get('/:id', function (req, res, next) {
         name: req.params.id
     }, (err, result) => {
         if (err) throw (err);
-        if (result === null) res.status(404).send('Not found')
+        if (result === null) res.status(404).send('Album not found')
         else res.send(result)
     })
 });

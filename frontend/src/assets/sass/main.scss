@@ -269,6 +269,18 @@ p {
     margin: 0px;
 }
 
+.background {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    z-index: -100;
+
+    object-fit: cover;
+    object-position: center;
+    -webkit-transition: background-image 0.2s ease-in-out;
+    transition: background-image 0.6s ease-in-out;
+}
+
 .container {
     padding: 24px !important;
 }
@@ -298,7 +310,12 @@ p {
     text-align: center;
     color: #2c3e50;
     overflow: hidden;
-    // overflow: hidden;
+}
+
+.v-snack__content{
+    * {
+        color: white
+    }
 }
 
 .about-content {
@@ -314,6 +331,6 @@ body {
     background-position: center;
     -webkit-transition: background-image 0.2s ease-in-out;
     transition: background-image 0.6s ease-in-out;
-    overflow: scroll;
+    overflow: auto;
     height: 100vh;
 }

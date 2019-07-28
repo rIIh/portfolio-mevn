@@ -1,7 +1,9 @@
 <template lang="pug">
   v-app#app()
-    .dev-box(v-if="true")
+    .dev-box(v-if="environment === 'development'")
       p.unselectable DEV
+    transition()
+      img.background(:src="assetsPath + background.path" alt="")
     v-navigation-drawer(absolute v-model="tools" v-if="breakpoint.smAndDown && isAuth")
       v-list
         v-list-tile(@click="adminChange")
@@ -30,7 +32,7 @@
         .flex.shrink
           v-layout(justify-space-between align-baseline shrink style="padding: 24px; padding-bottom: 0")
             v-flex(shrink)
-              v-icon.pr-3(@click.stop="tools = !tools" v-if="breakpoint.smAndDown && isAuth") menu
+              v-icon.unselectable.pr-3(@click.stop="tools = !tools" v-if="breakpoint.smAndDown && isAuth") menu
               router-link(:to="link()" class="main link")
                 h1.brand.unselectable(:class="$store.getters.theme" :style="breakpoint.smAndDown ? 'font-size: 24px' : ''") Yura&#160;Taralov
               template(v-if="isAuth && breakpoint.mdAndUp")
@@ -58,95 +60,109 @@ import Options from "@/components/Options.vue";
 import { Bus } from "./event-bus";
 
 const C = require("./api/consts");
+const Api = require("./api/settings_api");
 const StyleTemplate = require("./api/style").default;
 
 export default {
-    data() {
-        return {
-            post: false,
-            uploading: false,
-            tools: false
-        };
-    },
-    computed: {
-        adminMode() {
-            return this.$store.getters.isSuper;
-        },
-        isAuth() {
-            return this.$store.getters.isAuthenticated;
-        },
-        isDev(){
-          return this.$store.getters.isDev;
-        },
-        breakpoint() {
-            return this.$vuetify.breakpoint;
-        }
-    },
-    methods: {
-        openEditor() {
-            this.$dialog.show(Album, {
-                title: "Create new album"
-            });
-        },
-        openPageEditor() {
-            this.$dialog.show(Options, {
-                id: this.$route.name,
-                fields: StyleTemplate,
-                title: "Toggle dark theme"
-            });
-        },
-        link() {
-            let target =
-                this.$router.currentRoute.name === "home" ? "/gallery" : "/";
-            return target;
-        },
-        adminChange() {
-            this.$store.dispatch(C.ADMIN_MODE_SWAP);
-        },
-        async logout() {
-            await this.$store.dispatch(C.AUTH_LOGOUT);
-            Bus.$emit("log-out");
-        },
-        resize(data) {
-            let s = data.target.screen;
-            Bus.$emit("window-resize");
-            this.$store.dispatch(C.RESIZE, {
-                availHeight: s.availHeight,
-                height: s.height,
-                orientation: {
-                    angle: s.orientation.angle,
-                    type: s.orientation.type
-                }
-            });
-        }
-    },
-    created: function() {
-        Axios.interceptors.response.use(undefined, function(err) {
-            return new Promise(function(resolve, reject) {
-                if (
-                    err.status === 401 &&
-                    err.config &&
-                    !err.config.__isRetryRequest
-                ) {
-                    // if you ever get an unauthorized, logout the user
-                    this.$store.dispatch(AUTH_LOGOUT);
-                    // you can also redirect to /login if needed !
-                }
-            });
-        });
-    },
-    mounted() {
-        window.addEventListener("resize", this.resize);
-        this.resize({ target: window });
-    },
-    beforeDestroy() {
-        window.removeEventListener("resize", this.resize);
-    },
-    components: {
-        Navigation,
-        Album,
-        Theme,
-        Options
+  data() {
+    return {
+      post: false,
+      uploading: false,
+      tools: false,
+      background: {}
+    };
+  },
+  watch: {
+    $route(to) {
+      this.background = {};
+      this.loadBackground(to.name);
     }
+  },
+  computed: {
+    adminMode() {
+      return this.$store.getters.isSuper;
+    },
+    environment(){
+      return process.env.NODE_ENV;
+    },
+    assetsPath() {
+      let path = process.env.VUE_APP_ASSETS_PATH;
+      return path === undefined ? "" : path;
+    },
+    isAuth() {
+      return this.$store.getters.isAuthenticated;
+    },
+    isDev() {
+      return this.$store.getters.isDev;
+    },
+    breakpoint() {
+      return this.$vuetify.breakpoint;
+    }
+  },
+  methods: {
+    async loadBackground(forRoute) {
+      this.background = await Api.getValue(forRoute + "_background");
+    },
+    openEditor() {
+      this.$dialog.show(Album, {
+        title: "Create new album"
+      });
+    },
+    openPageEditor() {
+      this.$dialog.show(Options, {
+        id: this.$route.name,
+        fields: StyleTemplate,
+        title: "Toggle dark theme"
+      });
+    },
+    link() {
+      let target = this.$router.currentRoute.name === "home" ? "/gallery" : "/";
+      return target;
+    },
+    adminChange() {
+      this.$store.dispatch(C.ADMIN_MODE_SWAP);
+    },
+    async logout() {
+      await this.$store.dispatch(C.AUTH_LOGOUT);
+      Bus.$emit("log-out");
+    },
+    resize(data) {
+      let s = data.target.screen;
+      Bus.$emit("window-resize");
+      this.$store.dispatch(C.RESIZE, {
+        availHeight: s.availHeight,
+        height: s.height,
+        orientation: {
+          angle: s.orientation.angle,
+          type: s.orientation.type
+        }
+      });
+    }
+  },
+  created: function() {
+    Axios.interceptors.response.use(undefined, function(err) {
+      return new Promise(function(resolve, reject) {
+        if (err.status === 401 && err.config && !err.config.__isRetryRequest) {
+          // if you ever get an unauthorized, logout the user
+          this.$store.dispatch(AUTH_LOGOUT);
+          // you can also redirect to /login if needed !
+        }
+      });
+    });
+    console.log(process.env.NODE_ENV)
+  },
+  mounted() {
+    window.addEventListener("resize", this.resize);
+    this.resize({ target: window });
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.resize);
+  },
+  components: {
+    Navigation,
+    Album,
+    Theme,
+    Options
+  }
 };
 </script>

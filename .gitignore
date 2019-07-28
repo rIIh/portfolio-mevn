@@ -4,3 +4,4 @@ resources
 .env*
 *.log
 .env.production
+server/public
