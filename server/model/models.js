@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
+const express = require('express');
 const saltRounds = 10;
 
 const {
@@ -29,13 +30,10 @@ const UserDAO = mongoose.model('user', UserSchema)
 const PhotoSchema = new Schema({
     path: String,
     hash: String,
-})
-
-// TODO: Create pre delete hooks
-
+});
 const PhotoDAO = mongoose.model('photo', PhotoSchema);
 
-const AlbumDAO = mongoose.model('album', new Schema({
+const AlbumScheme = new Schema({
     name: String,
     coverIndex: Number,
     photos: [{
@@ -44,7 +42,25 @@ const AlbumDAO = mongoose.model('album', new Schema({
     }],
     date: Date,
     hidden: Boolean
-}))
+});
+AlbumScheme.post('remove', function(doc) {
+    console.log('Remove post hook for album', doc)
+    var fs = require('fs');
+    doc.photos.forEach(photo => {
+        fs.unlink('resources/' + photo.path, (err, res) => console.log(err,res));
+    });
+    //fs.unlink(filePath, callbackFunction)
+});
+async function inspectStorage(oldValue, newValue){
+    var fs = require('fs');
+    var deletedPhotos = oldValue.photos.filter(oldPhoto => 
+        newValue.photos.filter(newPhoto => newPhoto._id == oldPhoto._id).length === 0
+    );
+    deletedPhotos.forEach(photo => {
+        fs.unlink('resources/' + photo.path, (err, res) => console.log(err,res));
+    });
+}
+const AlbumDAO = mongoose.model('album', AlbumScheme)
 
 const SettingsDAO = mongoose.model('settings', new Schema({
     name: String,
@@ -56,4 +72,5 @@ module.exports = {
     PhotoDAO,
     SettingsDAO,
     AlbumDAO,
+    inspectStorage
 }

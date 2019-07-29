@@ -77,29 +77,25 @@ function parsePhotos(req, res, next) {
     }
 }
 
-//FIX: Check if photo deleted.
 router.put('/', function (req, res, next) {
     if (!req.connection.authenticated) res.status(401).send();
-    let queue = []
+    // let queue = []
     req.body.forEach(album => {
-        queue.push({
-            updateOne: {
-                filter: {
-                    _id: album._id
-                },
-                update: album
-            }
+        DAO.AlbumDAO.findOne({
+            _id: album._id
+        }, async (err, res) => {
+            await DAO.inspectStorage(res, album);
+            res.update(album, {upsert: true, overwrite: true}, (err, res) => console.log(err, res))
         })
     });
-    DAO.AlbumDAO.bulkWrite(queue).then(res => console.log('Album updated', res.insertedCount, res.modifiedCount, res.deletedCount))
-    res.json(queue)
+    res.status(200).send();
 })
 
 router.delete('/:name', function (req, res, next) {
     if (!req.connection.authenticated) res.status(401).send();
-    DAO.AlbumDAO.deleteOne({
+    DAO.AlbumDAO.findOne({
         name: req.params.name
-    }, console.log)
+    }, (err, doc) => doc.remove())
     res.send('Everything is OK')
 })
 

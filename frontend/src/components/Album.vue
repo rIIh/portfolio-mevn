@@ -23,9 +23,9 @@
                             img(:src="(editing && !photo.file) ? assetsPath + photo.path : photo.path" :key="index" width="100%")
                 v-alert(type="error" outline :value="model.photos[0] === undefined") At least one photo is required
                 .layout.justify-space-between.align-center.fluid.row
-                    v-switch.flex.grow(v-model="compress" color="black" label="Compress images before upload")
-                    v-progress-linear.shrink.mx-3(v-if="processing" height="10" indeterminate)
-                
+                    v-switch.flex.grow(v-model="compress" color="black" :label="processing ? 'Processing' : 'Compress images before upload'")
+                    v-progress-linear.mx-3(v-if="processing" height="10" color="white" backgroundColor="black" backgroundOpacity="0.8" style="transform: translateY(-5px);" indeterminate)
+                    v-icon.unselectable(v-if="processed" style="transform: translateY(-5px);") done
                 .layout.justify-space-between.fluid
                     .flex.shrink(v-if="was")
                         r-btn.ma-0(ignoreTheme @click="remove") Remove
@@ -36,80 +36,6 @@
                         r-btn.ma-0(ignoreTheme :disabled="!valid || processing" :loading="busyVal" :progress="busyProgress" @click="was ? update() : upload()") {{ editing ? 'Update' : 'Upload'}}
                 input(type="file" style="display: none" ref="photo_picker" multiple accept="image/*" @change="onPhotosPicked")
 </template>
-
-<style lang="scss">
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active до версии 2.1.8 */ {
-  opacity: 0;
-}
-
-/*Wrapper*/
-.my-scrollbar {
-  // width: 35%;
-  // min-width: 300px;
-
-  max-height: 90vh;
-  color: aqua;
-}
-.photos {
-  line-height: 0;
-  .photo {
-    position: relative;
-  }
-}
-
-.upload_image {
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
-.remove_btn {
-  position: absolute;
-  top: 0;
-  right: 0;
-
-  // background-color: #ff6b51;
-  background-color: black;
-}
-
-.overlay {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 100%;
-  width: 100%;
-  transition: 0.5s ease;
-  z-index: 0;
-
-  &.cover {
-    background-color: rgba(255, 255, 255, 0.637);
-  }
-  &.remove {
-    background-color: rgba(255, 51, 0, 0.479);
-  }
-  .overlay_item {
-    z-index: 100;
-    &.centered {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      -webkit-transform: translate(-50%, -50%);
-      -ms-transform: translate(-50%, -50%);
-      transform: translate(-50%, -50%);
-      text-align: center;
-    }
-  }
-}
-</style>
-
 
 <script>
 import VueScrollbar from "vue2-scrollbar";
@@ -170,6 +96,9 @@ export default {
     valid() {
       return this.formValid && this.model.photos[0] !== undefined;
     },
+    processed(){
+      return this.model.photos.length > 0 && this.compress && !this.processing && this.model.photos.every(photo => photo.processed);
+    },
     assetsPath() {
       let path = process.env.VUE_APP_ASSETS_PATH;
       return path === undefined ? "" : path;
@@ -209,7 +138,7 @@ export default {
           this.model.photos.push(photo);
         });
         reader.addEventListener("loadend", () => {
-          this.processPhotos();
+          if(this.compress) this.processPhotos();
         });
       });
     },
@@ -325,3 +254,75 @@ export default {
 };
 </script>
 
+<style lang="scss">
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active до версии 2.1.8 */ {
+  opacity: 0;
+}
+
+/*Wrapper*/
+.my-scrollbar {
+  // width: 35%;
+  // min-width: 300px;
+
+  max-height: 90vh;
+  color: aqua;
+}
+.photos {
+  line-height: 0;
+  .photo {
+    position: relative;
+  }
+}
+
+.upload_image {
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.remove_btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  // background-color: #ff6b51;
+  background-color: black;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  transition: 0.5s ease;
+  z-index: 0;
+
+  &.cover {
+    background-color: rgba(255, 255, 255, 0.637);
+  }
+  &.remove {
+    background-color: rgba(255, 51, 0, 0.479);
+  }
+  .overlay_item {
+    z-index: 100;
+    &.centered {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -webkit-transform: translate(-50%, -50%);
+      -ms-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+  }
+}
+</style>
