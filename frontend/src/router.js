@@ -44,6 +44,10 @@ router.beforeEach((to, from, next) => {
       .dispatch(C.AUTH_CHECK)
       .then(() => {
         next();
+        router.app.$gtm.trackEvent({
+          event: "auth_success",
+          category: "Internal"
+        });
       })
       .catch(() => {
         next("/");

@@ -33,7 +33,8 @@ function parseAlbum(req, next) {
     form.keepExtensions = true;
     form.hash = 'md5';
     form.parse(req)
-        .on('file', (name, file) => {
+        .on('file', (_, file) => {
+            console.log(file)
             album.photos.push({
                 path: file.path.substring(file.path.indexOf('photos')),
                 hash: file.hash,

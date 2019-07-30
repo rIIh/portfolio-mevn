@@ -148,7 +148,7 @@ export default {
         if (photo.file && !photo.processed) {
           var processedFile = await imageCompression(photo.file, {
             maxSizeMB: 1,
-            maxWidthOrHeight: 1920
+            maxWidthOrHeight: 900
           });
           photo.processed = true;
           photo.file = processedFile;

@@ -18,6 +18,14 @@ const context = {
   router
 };
 
+import GTM from 'vue-gtm';
+Vue.use(GTM, {
+  id: 'GTM-PNF3FKR', // Your GTM ID
+  debug: true, // Whether or not display console logs debugs (optional)
+  vueRouter: router, // Pass the router instance to automatically sync with router (optional)
+  ignoredViews: ['login'] // If router, you can exclude some routes name (case insensitive) (optional)
+});
+
 import VuetifyDialog from "vuetify-dialog";
 Vue.use(VuetifyDialog, {
   context: context
