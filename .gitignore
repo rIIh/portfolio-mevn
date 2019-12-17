@@ -2,6 +2,7 @@ node_modules
 package-lock.json
 resources
 .env*
+!.env
 *.log
 .env.production
 server/public
