@@ -1,4 +1,4 @@
-FROM mhart/alpine-node
+FROM mhart/alpine-node:10.10
 RUN apk add --no-cache make gcc g++ python
 
 WORKDIR /application
@@ -14,4 +14,5 @@ COPY . .
 
 WORKDIR /application/server
 RUN npm install
+EXPOSE 5000
 CMD [ "npm", "start" ]
