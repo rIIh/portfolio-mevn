@@ -1,5 +1,5 @@
-# Yuri Taralov Portfolio site
-Commercial work for **Yura Taralov** the photographer
+# Photo Portfolio site
+Commercial work for the photographer
 
 Photo portfolio site with **custom admin tools**
 

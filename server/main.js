@@ -30,7 +30,7 @@ app.use(function (err, req, res, next) {
     res.send(err)
 });
 
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true
 });
 

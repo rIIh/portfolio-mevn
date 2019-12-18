@@ -1,7 +1,7 @@
 {
-  "name": "yurta",
-  "version": "0.0.1",
-  "description": "Portfolio sire using Express, Vue and Mongo",
+  "name": "portfolio-server",
+  "version": "1.0",
+  "description": "Portfolio site using Express, Vue and Mongo",
   "main": "main.js",
   "scripts": {
     "front:build": "npm run --prefix ../frontend build",
@@ -14,7 +14,7 @@
     "site",
     "portfolio"
   ],
-  "author": "Alexey Skrynnic",
+  "author": "Alexey Skrynnic/pseudonim",
   "license": "MIT",
   "devDependencies": {
     "morgan": "^1.9.1",

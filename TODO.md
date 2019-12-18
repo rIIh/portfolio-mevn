@@ -6,7 +6,7 @@
 * **FEATURE:** Compress images before upload
   * Options images compress
   * **✓** Album photos compress
-  * Generate multidim images and thumbnails
+  * Generate multi dimension images and thumbnails
 
 ## Backend
 
