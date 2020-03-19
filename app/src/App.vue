@@ -76,6 +76,7 @@ export default {
     $route(to) {
       this.background = {};
       this.loadBackground(to.name);
+      document.title = to.meta.title || 'Your Website'
     }
   },
   computed: {

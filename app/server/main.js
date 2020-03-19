@@ -2,36 +2,38 @@ const express = require('express');
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const cors = require('cors')
-// const morgan = require('morgan')
 const jwt = require('jsonwebtoken');
 require('dotenv-flow').config()
 
+const DB_HOST = process.env.DB_HOST || 'localhost';
+const DB_PORT = process.env.DB_HOST || '27017';
+const MONGO_URL = `mongodb://${DB_HOST}:${DB_PORT}/photo-portfolio`;
+const PORT = process.env.PORT || 5000;
+const USER = {
+    NAME: process.env.DEFAULT_USER || 'demo',
+    PASS: process.env.DEFAULT_PASSWORD || 'demo',
+}
 
 const app = express();
 
-// var dash = require('appmetrics-dash').attach()
 require('./config/dirs').init(__dirname)
-
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
-    extended: false
-})); // parse application/x-www-form-urlencoded
+    extended: false,
+})); 
+
 app.use(cors());
-// app.use(morgan('tiny'));
 
-app.listen(process.env.PORT || 5000, () => {
-    let port = process.env.PORT || 5000
-    console.log('Express listening on port ' + port)
+app.listen(PORT, () => {
+    console.log('Express listening on port ' + PORT)
 });
 
-app.use(function (err, req, res, next) {
-    // console.log(err);
-    res.send(err)
-});
+console.log(`Connecting to mongo instance at: ${MONGO_URL}`)
 
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true
+mongoose.connect(MONGO_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
 });
 
 mongoose.connection.on('error', () => {
@@ -41,8 +43,10 @@ mongoose.connection.on('error', () => {
 mongoose.connection.once('open', function () {
     console.log("DB connection established")
     require('./controllers/db_controller').createRoot(
-        process.env.DEFAULT_USER,
-        process.env.DEFAULT_PASSWORD);
+        USER.NAME, USER.PASS);
+    console.log(`Root user created with: 
+                    Login: ${USER.NAME}
+                    Password: ${USER.PASS}`)
 })
 
 app.set('secretKey', 'yuri-tar-prod-!rathive'); // jwt secret token
@@ -71,7 +75,7 @@ function privateAccess(req, res, next) {
             res.status(401).json({
                 status: "error",
                 message: err.message,
-                data: null
+                data: null,
             });
         } else {
             // add user id to request

@@ -6,7 +6,7 @@ import store from "./store";
 import Vuetify from "vuetify";
 import "vuetify/dist/vuetify.min.css";
 
-import "./assets/sass/app.sass";
+import "./assets/sass/app.scss";
 import "./assets/sass/main.scss";
 
 import "vue2-scrollbar/dist/style/vue2-scrollbar.css";
@@ -15,12 +15,12 @@ import ScrollBar from "vue2-scrollbar";
 
 const context = {
   store,
-  router
+  router,
 };
 
 import VuetifyDialog from "vuetify-dialog";
 Vue.use(VuetifyDialog, {
-  context: context
+  context: context,
 });
 
 // Import component
@@ -96,5 +96,5 @@ if (token) {
 export default new Vue({
   router,
   store,
-  render: h => h(App)
+  render: h => h(App),
 }).$mount("#app");

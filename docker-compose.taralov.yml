@@ -1,0 +1,25 @@
+version: "3.7"
+services:
+  app:
+    # build: ./app
+    image: taralov
+    container_name: taralov
+    restart: always
+    volumes: 
+      - ./config.json:./config/config.json
+    environment: 
+      - DB_HOST=mongo
+      - DB_PORT=27017
+      - DEFAULT_USER=yurataralov
+      - DEFAULT_PASSWORD=442021
+    ports:
+      - "80:5000"
+    links:
+      - mongo
+  mongo:
+    container_name: mongodb
+    image: mongo
+    volumes:
+      - ./data:/data/db
+    ports:
+      - "27017:27017"
