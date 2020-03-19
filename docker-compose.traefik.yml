@@ -1,0 +1,38 @@
+version: "3.7"
+services:
+  photo-portfolio-client:
+    build: ./app
+    image: ${REGISTRY}photo-portfolio-client
+    container_name: photo-portfolio-client
+    restart: always
+    environment: 
+      DB_HOST: "photo-portfolio-db"
+    volumes:
+      - photo-portfolio-files:/usr/src/app/server/resources
+    ports:
+      - "5000"
+    networks: 
+      - internal
+      - web
+    labels: 
+      - traefik.http.routers.photo-portfolio.rule=Host(`portfolio1.${REMOTE:-localhost}`)
+      - traefik.docker.network=web
+  photo-portfolio-db:
+    image: mongo
+    restart: always
+    networks: 
+      - internal
+    volumes:
+      - photo-portfolio-db-data:/data/db
+
+volumes:
+  photo-portfolio-files: 
+    driver: local
+  photo-portfolio-db-data:
+    driver: local
+
+networks:
+  internal:
+    external: false
+  web:
+    external: true

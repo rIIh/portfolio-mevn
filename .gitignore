@@ -1,8 +1,9 @@
 node_modules
 package-lock.json
 resources
-.env*
-!.env
+**/server/public
+.env
+!.env.example
 *.log
 .env.production
 server/public

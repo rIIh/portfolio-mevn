@@ -6,34 +6,51 @@ const C = require("./api/consts");
 
 Vue.use(Router);
 
+const title = 'Portfolio'
+
 const router = new Router({
   mode: "history",
   base: process.env.BASE_URL,
   routes: [{
       path: "/",
       name: "home",
-      component: () => import('./views/Home.vue')
+      component: () => import('./views/Home.vue'),
+      meta: {
+        title
+      }
     },
     {
       path: "/gallery",
       name: "gallery",
-      component: () => import('./views/Gallery.vue')
+      component: () => import('./views/Gallery.vue'),
+      meta: {
+        title: `${title} - Gallery`,
+      }
     },
     {
       path: "/login",
       name: "login",
-      component: () => import('./views/Login.vue')
+      component: () => import('./views/Login.vue'),
+      meta: {
+        title: `${title} - Login Page`,
+      }
     },
     {
       path: "/album_:id",
       name: "album",
       component: () => import('./views/AlbumPage.vue'),
-      props: true
+      props: true,
+      meta: {
+        title: `${title} - Album Page`,
+      }
     },
     {
       path: "/about",
       name: "about",
-      component: () => import("./views/About.vue")
+      component: () => import("./views/About.vue"),
+      meta: {
+        title: `${title} - About`,
+      }
     }
   ]
 });
@@ -44,12 +61,15 @@ router.beforeEach((to, from, next) => {
       .dispatch(C.AUTH_CHECK)
       .then(() => {
         next();
-        router.app.$gtm.trackEvent({
-          event: "auth_success",
-          category: "Internal"
-        });
+        if (router.app.$gtm) {
+          router.app.$gtm.trackEvent({
+            event: "auth_success",
+            category: "Internal"
+          });
+        }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("Failed authentication check", err)
         next("/");
       });
   } else next();
