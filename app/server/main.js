@@ -6,8 +6,9 @@ const jwt = require('jsonwebtoken');
 require('dotenv-flow').config()
 
 const DB_HOST = process.env.DB_HOST || 'localhost';
-const DB_PORT = process.env.DB_HOST || '27017';
-const MONGO_URL = `mongodb://${DB_HOST}:${DB_PORT}/photo-portfolio`;
+const DB_PORT = process.env.DB_PORT || '27017';
+const DB_NAME = process.env.DB_NAME || 'photo-portfolio';
+const MONGO_URL = `mongodb://${DB_HOST}:${DB_PORT}/${DB_NAME}`;
 const PORT = process.env.PORT || 5000;
 const USER = {
     NAME: process.env.DEFAULT_USER || 'demo',

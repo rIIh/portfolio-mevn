@@ -9,10 +9,10 @@ const fs = require('fs');
 module.exports = {
     init: function init(path, extra) {
         !fs.existsSync(path + '/resources') && fs.mkdirSync(path + '/resources');
-        if (!path) return
+        if (!path) {return}
         createDirs(path, dirs);
         if (extra)
-            createDirs(path, extra);
+            {createDirs(path, extra);}
     }
 }
 

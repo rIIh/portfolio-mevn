@@ -6,7 +6,7 @@ const C = require("./api/consts");
 
 Vue.use(Router);
 
-const title = 'Portfolio'
+const title = 'Yura Taralov'
 
 const router = new Router({
   mode: "history",
