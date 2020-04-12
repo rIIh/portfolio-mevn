@@ -34,7 +34,7 @@
             v-flex(shrink)
               v-icon.unselectable.pr-3(@click.stop="tools = !tools" v-if="breakpoint.smAndDown && isAuth") menu
               router-link(:to="link()" class="main link")
-                h1.brand.unselectable(:class="$store.getters.theme" :style="breakpoint.smAndDown ? 'font-size: 24px' : ''") Melv Space
+                h1.brand.unselectable(:class="$store.getters.theme" :style="breakpoint.smAndDown ? 'font-size: 24px' : ''") {{ title }}
               template(v-if="isAuth && breakpoint.mdAndUp")
                 span.no-wrap.px-3
                   r-btn.px-3(:pressed="adminMode" @click="adminChange") admin mode
@@ -58,6 +58,7 @@ import Theme from "@/components/Theme.vue";
 import Axios from "axios";
 import Options from "@/components/Options.vue";
 import { Bus } from "./event-bus";
+import { title } from "./main";
 
 const C = require("./api/consts");
 const Api = require("./api/settings_api");
@@ -66,10 +67,11 @@ const StyleTemplate = require("./api/style").default;
 export default {
   data() {
     return {
+      title,
       post: false,
       uploading: false,
       tools: false,
-      background: {}
+      background: {},
     };
   },
   watch: {

@@ -1,12 +1,11 @@
 import Vue from "vue";
 import Router from "vue-router";
+import { title } from './main';
 
 import store from "./store";
 const C = require("./api/consts");
 
 Vue.use(Router);
-
-const title = 'Yura Taralov'
 
 const router = new Router({
   mode: "history",
