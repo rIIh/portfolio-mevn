@@ -3,7 +3,16 @@ services:
   app:
     container_name: yurta
     restart: always
-    build: .
+    build: ./app
+    image: photos
+    environment: 
+      - DB_HOST=mongo
+      - DB_PORT=27017
+      - DB_NAME=yurta_db
+      - DEFAULT_USER=yurataralov
+      - DEFAULT_PASSWORD=442021
+    volumes:
+      - ./resources:/usr/src/app/server/resources
     ports:
       - "5000:5000"
     links:
