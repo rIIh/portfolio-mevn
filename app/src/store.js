@@ -88,6 +88,7 @@ export default new Vuex.Store({
         commit(C.AUTH_REQUEST);
         Axios.post(C.AUTH_URL, user)
           .then(resp => {
+            console.log(resp)
             const token = resp.data.data.token;
             localStorage.setItem("user-token", token); // store the token in localstorage
             Axios.defaults.headers.common["x-access-token"] = token;

@@ -1,14 +1,14 @@
 <template lang="pug">
   .home(:style="breakpoint.mdAndUp ? 'max-height ' : ''")
     .layout.fill-height.row(v-if="breakpoint.mdAndUp" )
-      .flex.shrink
+      .flex.shrink(:style="{ minWidth: '150px' }")
         .layout.column.fill-height.nav_side
           div(class="link_row" shrink v-for="(album, index) in albums" :key="album.name" @mouseenter="mouseEnterLink(index)" @mouseleave="mouseExitLink(index)" v-show="adminMode || !album.hidden")
             span.link-box(@mouseenter="openAndTop(index)")
               router-link(class="link" :to="'album_'+album.name")
                 a.ignore-theme(:style="{'text-decoration': album.hidden ? 'line-through' : 'none', 'overflow-x': adminMode ? 'hidden' : ''}"  ) {{ album.name }}
             transition(name="fade")
-              span(v-if="adminMode" v-show="album.mouseOverLink")
+              span.tools(v-if="adminMode" v-show="album.mouseOverLink")
                 button(@click="openEditor(index)" @mouseenter="openAndTop(index)")
                   v-icon.material-icons-outlined edit
                 button(@click="swapVisible(index); updateVisibility(index)" @mouseenter="openAndTop(index)")
@@ -73,9 +73,11 @@
     }
 
     .link-box {
+        transition: 0.35s;
+        padding-right: 63px;
         &:hover {
+            transform: translateX(10px);
             a {
-                padding-left: 10px;
                 color: lightgrey;
             }
         }
@@ -87,9 +89,14 @@
         justify-content: space-between;
         flex-direction: row;
         display: flex;
-        width: 150px;
         height: 30px;
         transition: 0.35s;
+        position: relative;
+
+        .tools {
+            position: absolute;
+            right: 0;
+        }
     }
 
     .closebtn {

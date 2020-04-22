@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Portfolio site using Express, Vue and Mongo",
   "scripts": {
-    "serve:client": "vue-cli-service serve",
-    "watch:client": "vue-cli-service build --watch",
+    "serve:client": "vue-cli-service serve --silent",
+    "watch:client": "vue-cli-service build --watch --silent",
     "dev:server": "nodemon --ignore './public/' --watch './server' main.js",
     "dev": "concurrently -k \"npm run serve:client\" \"npm run dev:server\"",
     "build": "vue-cli-service build",

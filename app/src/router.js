@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
-import { title } from './main';
+import { title } from './config';
 
 import store from "./store";
 const C = require("./api/consts");

@@ -58,7 +58,7 @@ import Theme from "@/components/Theme.vue";
 import Axios from "axios";
 import Options from "@/components/Options.vue";
 import { Bus } from "./event-bus";
-import { title } from "./main";
+import { title } from "./config";
 
 const C = require("./api/consts");
 const Api = require("./api/settings_api");

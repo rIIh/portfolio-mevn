@@ -14,8 +14,6 @@ import "vue2-scrollbar/dist/style/vue2-scrollbar.css";
 
 import ScrollBar from "vue2-scrollbar";
 
-export var title = 'Yura Taralov'
-
 const context = {
   store,
   router,
@@ -99,6 +97,5 @@ if (token) {
 export default new Vue({
   router,
   store,
-  title,
   render: h => h(App),
 }).$mount("#app");

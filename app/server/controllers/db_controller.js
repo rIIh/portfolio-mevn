@@ -82,7 +82,8 @@ module.exports = {
                         }
                     });
                 } else {
-                    res.json({
+                    console.warn('Wrong access', req.body)
+                    res.status(401).json({
                         status: "error",
                         message: "Invalid email/password!!!",
                         data: null
